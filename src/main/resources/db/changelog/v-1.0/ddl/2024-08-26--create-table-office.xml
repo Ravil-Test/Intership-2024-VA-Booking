@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="2024-08-26--create-table-office" author="Kirill_Mamonov">
+
+        <preConditions>
+            <not>
+                <tableExists tableName="office"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="office">
+            <column name="id" type="uuid">
+                <constraints nullable="true" primaryKey="true"/>
+            </column>
+            <column name="name" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_delete" type="bool" defaultValueBoolean="false"/>
+        </createTable>
+
+    </changeSet>
+
+</databaseChangeLog>
