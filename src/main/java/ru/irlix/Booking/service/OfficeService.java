@@ -1,4 +1,4 @@
-package ru.irlix.booking.service.api;
+package ru.irlix.booking.service;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.NonNull;
@@ -49,7 +49,7 @@ public interface OfficeService {
     /**
      * Удалить офис
      *
-     * @param id     - id офиса
+     * @param id - id офиса
      */
     void delete(@NotNull UUID id);
 }
