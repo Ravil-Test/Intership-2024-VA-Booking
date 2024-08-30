@@ -5,23 +5,23 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.irlix.booking.entity.Office;
+import ru.irlix.booking.entity.Workplace;
 
 import java.util.UUID;
 
 /**
- * Репозиторий офиса
+ * Репозиторий рабочего места
  */
 @Repository
-public interface OfficeRepository extends JpaRepository<Office, UUID> {
+public interface WorkplaceRepository extends JpaRepository<Workplace, UUID> {
 
     /**
-     * Изменить статус офиса на удален/не удален
+     * Изменить статус рабочего места на удален
      *
-     * @param id     -id офиса
+     * @param id     - id рабочего места
      * @param delete - статус (удален - true/не удален - false)
      */
     @Modifying
-    @Query("update Office o set o.isDelete = :delete where o.id = :id")
-    void changeOfficeIsDelete(@Param("id") UUID id, @Param("delete") boolean delete);
+    @Query("update Workplace w set w.isDelete = :delete where w.id = :id")
+    void changeWorkplaceIsDelete(@Param("id") UUID id, @Param("delete") boolean delete);
 }

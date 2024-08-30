@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.irlix.booking.dto.office.OfficeCreateRequest;
 import ru.irlix.booking.dto.office.OfficeResponse;
 import ru.irlix.booking.dto.office.OfficeUpdateRequest;
-import ru.irlix.booking.service.api.OfficeService;
+import ru.irlix.booking.service.OfficeService;
 
 import java.util.List;
 import java.util.UUID;
@@ -53,7 +53,7 @@ public class OfficeController {
             @ApiResponse(responseCode = "404", description = "Офис не найден"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public OfficeResponse getById(@PathVariable UUID id) {
+    public OfficeResponse getOfficeById(@PathVariable UUID id) {
         return officeService.getById(id);
     }
 
@@ -87,7 +87,7 @@ public class OfficeController {
     @Operation(summary = "Удалить офис",
             description = "Возвращает статус 200")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Офис удален"),
+            @ApiResponse(responseCode = "200", description = "Офис удален"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные"),
             @ApiResponse(responseCode = "404", description = "Офис не найден"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")

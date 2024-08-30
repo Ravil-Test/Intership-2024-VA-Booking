@@ -11,7 +11,7 @@ import ru.irlix.booking.dto.office.OfficeUpdateRequest;
 import ru.irlix.booking.entity.Office;
 import ru.irlix.booking.mapper.OfficeMapper;
 import ru.irlix.booking.repository.OfficeRepository;
-import ru.irlix.booking.service.api.OfficeService;
+import ru.irlix.booking.service.OfficeService;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +28,7 @@ public class OfficeServiceImpl implements OfficeService {
     @Override
     public OfficeResponse getById(UUID id) {
         Office foundOffice = getOfficeWithNullCheck(id);
-        log.info("Get office with id: {}", id + ": " + foundOffice);
+        log.info("Get office with id: {} : {}", id, foundOffice);
         return officeMapper.entityToResponse(foundOffice);
     }
 
@@ -42,7 +42,7 @@ public class OfficeServiceImpl implements OfficeService {
         Office createdOffice = officeMapper.createRequestToEntity(createRequest);
 
         Office savedOffice = officeRepository.save(createdOffice);
-        log.info("Created office {}", savedOffice);
+        log.info("Created office : {}", savedOffice);
 
         return officeMapper.entityToResponse(savedOffice);
     }
@@ -56,7 +56,7 @@ public class OfficeServiceImpl implements OfficeService {
         Optional.ofNullable(updateForOffice.getAddress()).ifPresent(currentOffice::setAddress);
 
         Office changedOffice = officeRepository.save(currentOffice);
-        log.info("Updated office {}", changedOffice);
+        log.info("Updated office with id: {} : {}", id, changedOffice);
 
         return officeMapper.entityToResponse(changedOffice);
     }
@@ -64,7 +64,7 @@ public class OfficeServiceImpl implements OfficeService {
     @Override
     public void delete(UUID id) {
         officeRepository.changeOfficeIsDelete(id, true);
-        log.info("Deleted office with id {}", id);
+        log.info("Deleted office with id : {}", id);
     }
 
     /**
