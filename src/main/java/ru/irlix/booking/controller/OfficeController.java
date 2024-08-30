@@ -28,7 +28,7 @@ import java.util.UUID;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/office")
+@RequestMapping("/offices")
 @Tag(name = "Контроллер офисов")
 public class OfficeController {
 
