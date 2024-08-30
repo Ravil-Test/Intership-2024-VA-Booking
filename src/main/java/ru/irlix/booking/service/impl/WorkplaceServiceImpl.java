@@ -1,4 +1,4 @@
-package ru.irlix.booking.service.imlp;
+package ru.irlix.booking.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;

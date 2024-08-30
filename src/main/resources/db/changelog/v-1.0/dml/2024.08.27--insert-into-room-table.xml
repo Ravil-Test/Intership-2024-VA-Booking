@@ -1,0 +1,40 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="2024-08-27--create-table-rooms" author="Alexandr_Makutsevich">
+
+        <preConditions>
+            <tableExists tableName="room"/>
+        </preConditions>
+
+        <insert tableName="room">
+            <column name="name" value="Малый переговорный зал"/>
+            <column name="floor_number" value="3"/>
+            <column name="room_number" value="15"/>
+        </insert>
+
+        <insert tableName="room">
+            <column name="name" value="Большой переговорный зал"/>
+            <column name="floor_number" value="2"/>
+            <column name="room_number" value="10"/>
+        </insert>
+
+        <insert tableName="room">
+            <column name="name" value="Кабинет дря backend разработки"/>
+            <column name="floor_number" value="1"/>
+            <column name="room_number" value="4"/>
+        </insert>
+
+        <insert tableName="room">
+            <column name="name" value="Кабинет дря frontend разработки"/>
+            <column name="floor_number" value="1"/>
+            <column name="room_number" value="1"/>
+        </insert>
+
+
+    </changeSet>
+</databaseChangeLog>
