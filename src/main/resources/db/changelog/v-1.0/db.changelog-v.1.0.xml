@@ -11,5 +11,7 @@
     <include file="dml/2024-08-26--insert-into-office-table.xml" relativeToChangelogFile="true"/>
     <include file="ddl/2024-08-28-create-workplace-table.xml" relativeToChangelogFile="true"/>
     <include file="dml/2024-08-28--insert-into-workplace-table.xml" relativeToChangelogFile="true"/>
+    <include file="ddl/2024-08-28--create-table-breakage_request.xml" relativeToChangelogFile="true"/>
+    <include file="dml/2024-08-28--insert-into-table-breakage_request.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
