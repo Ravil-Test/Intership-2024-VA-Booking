@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="2024-08-28--insert-into-table-breakage_request" author="Ravil_Nurullin">
+
+        <preConditions>
+                <tableExists tableName="breakage_request"/>
+        </preConditions>
+
+        <insert tableName="breakage_request">
+            <column name="id" value="00000000-0000-0000-0000-111111111111"/>
+            <column name="request_datetime" value="NOW()"/>
+            <column name="description" value="Test breakage №1"/>
+            <column name="is_completed" value="false"/>
+            <column name="is_canceled" value="false"/>
+        </insert>
+
+        <insert tableName="breakage_request">
+            <column name="id" value="00000000-0000-0000-0000-222222222222"/>
+            <column name="request_datetime" value="NOW()"/>
+            <column name="description" value="Test breakage №2"/>
+            <column name="is_completed" value="false"/>
+            <column name="is_canceled" value="false"/>
+        </insert>
+
+    </changeSet>
+</databaseChangeLog>
