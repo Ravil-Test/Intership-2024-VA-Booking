@@ -5,12 +5,14 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.irlix.booking.dto.workplace.WorkplaceCreateRequest;
 import ru.irlix.booking.dto.workplace.WorkplaceResponse;
 import ru.irlix.booking.dto.workplace.WorkplaceUpdateRequest;
 import ru.irlix.booking.entity.Workplace;
 import ru.irlix.booking.mapper.WorkplaceMapper;
 import ru.irlix.booking.repository.WorkplaceRepository;
+import ru.irlix.booking.service.RoomService;
 import ru.irlix.booking.service.WorkplaceService;
 
 import java.util.List;
@@ -24,6 +26,7 @@ public class WorkplaceServiceImpl implements WorkplaceService {
 
     private final WorkplaceRepository workplaceRepository;
     private final WorkplaceMapper workplaceMapper;
+    private final RoomService roomService;
 
     @Override
     public WorkplaceResponse getById(UUID id) {
@@ -42,6 +45,8 @@ public class WorkplaceServiceImpl implements WorkplaceService {
     public WorkplaceResponse save(@NonNull WorkplaceCreateRequest createRequest) {
         Workplace forSave = workplaceMapper.createRequestToEntity(createRequest);
 
+        forSave.setRoom(roomService.getRoomWithNullCheck(createRequest.roomId()));
+
         Workplace saved = workplaceRepository.save(forSave);
         log.info("Save workplace: {} ", saved);
 
@@ -53,6 +58,8 @@ public class WorkplaceServiceImpl implements WorkplaceService {
         Workplace currentWorkplace = getWorkplaceWithNullCheck(id);
         Workplace update = workplaceMapper.updateRequestToEntity(updateRequest);
 
+        if (Optional.ofNullable(updateRequest.roomId()).isPresent())
+            update.setRoom(roomService.getRoomWithNullCheck(updateRequest.roomId()));
         Optional.ofNullable(update.getNumber()).ifPresent(currentWorkplace::setNumber);
         Optional.ofNullable(update.getDescription()).ifPresent(currentWorkplace::setDescription);
 
@@ -63,6 +70,7 @@ public class WorkplaceServiceImpl implements WorkplaceService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID id) {
         workplaceRepository.changeWorkplaceIsDelete(id, true);
         log.info("Delete workplace with id: {}", id);
@@ -74,7 +82,7 @@ public class WorkplaceServiceImpl implements WorkplaceService {
      * @param id - id рабочего места
      * @return - найденное рабочее место
      */
-    private Workplace getWorkplaceWithNullCheck(UUID id) {
+    protected Workplace getWorkplaceWithNullCheck(UUID id) {
         return workplaceRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Workplace with id " + id + " not found"));
     }

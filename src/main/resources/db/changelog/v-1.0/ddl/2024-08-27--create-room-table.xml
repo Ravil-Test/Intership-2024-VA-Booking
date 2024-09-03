@@ -14,20 +14,36 @@
         </preConditions>
 
         <createTable tableName="room">
-            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
-                <constraints primaryKey="true"/>
+            <column name="id" type="uuid">
+                <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="name" type="TEXT">
+            <column name="name" type="text">
                 <constraints nullable="false"/>
             </column>
-            <column name="floor_number" type="SMALLINT">
+            <column name="floor_number" type="smallint">
                 <constraints nullable="false"/>
             </column>
-            <column name="room_number" type="SMALLINT">
+            <column name="room_number" type="smallint">
                 <constraints nullable="false"/>
             </column>
-            <column name="is_delete" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="is_delete" type="boolean" defaultValueBoolean="false"/>
         </createTable>
+
+    </changeSet>
+
+    <changeSet id="2024-08-28-add-foreignkey-room-office" author="Kirill_Mamonov">
+
+        <preConditions>
+            <tableExists tableName="room"/>
+            <tableExists tableName="office"/>
+        </preConditions>
+
+        <addColumn tableName="room">
+            <column name="office_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_office_room_into_room_table"
+                             references="office(id)"/>
+            </column>
+        </addColumn>
 
     </changeSet>
 

@@ -14,18 +14,20 @@ import java.util.List;
 /**
  * Маппер для рабочего места
  */
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.ERROR, uses = RoomMapper.class)
 public interface WorkplaceMapper {
 
-    @Mapping(target = "isDelete", ignore = true)
+    @Mapping(target = "isDelete", source = "delete")
     WorkplaceResponse entityToResponse(Workplace workplace);
 
     List<WorkplaceResponse> entityListToReponseList(List<Workplace> workplaces);
 
+    @Mapping(target = "room", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "delete", ignore = true)
     Workplace createRequestToEntity(WorkplaceCreateRequest createRequest);
 
+    @Mapping(target = "room", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "delete", ignore = true)
     Workplace updateRequestToEntity(WorkplaceUpdateRequest updateRequest);
