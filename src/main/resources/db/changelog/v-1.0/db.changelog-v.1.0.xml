@@ -5,11 +5,12 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-    <include file="ddl/2024.08.27--create-room-table.xml" relativeToChangelogFile="true"/>
-    <include file="dml/2024.08.27--insert-into-room-table.xml" relativeToChangelogFile="true"/>
-    <include file="ddl/2024-08-26--create-table-office.xml" relativeToChangelogFile="true"/>
+    <include file="ddl/2024-08-26--create-office-table.xml" relativeToChangelogFile="true"/>
+    <include file="ddl/2024-08-27--create-room-table.xml" relativeToChangelogFile="true"/>
+    <include file="ddl/2024-08-28--create-workplace-table.xml" relativeToChangelogFile="true"/>
+
     <include file="dml/2024-08-26--insert-into-office-table.xml" relativeToChangelogFile="true"/>
-    <include file="ddl/2024-08-28-create-workplace-table.xml" relativeToChangelogFile="true"/>
+    <include file="dml/2024-08-27--insert-into-room-table.xml" relativeToChangelogFile="true"/>
     <include file="dml/2024-08-28--insert-into-workplace-table.xml" relativeToChangelogFile="true"/>
     <include file="ddl/2024-08-28--create-table-breakage_request.xml" relativeToChangelogFile="true"/>
     <include file="dml/2024-08-28--insert-into-table-breakage_request.xml" relativeToChangelogFile="true"/>

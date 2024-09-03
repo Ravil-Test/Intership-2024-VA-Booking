@@ -5,6 +5,7 @@ import org.springframework.lang.NonNull;
 import ru.irlix.booking.dto.room.RoomCreateRequest;
 import ru.irlix.booking.dto.room.RoomResponse;
 import ru.irlix.booking.dto.room.RoomUpdateRequest;
+import ru.irlix.booking.entity.Room;
 
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +40,7 @@ public interface RoomService {
     /**
      * Обновить помещение
      *
-     * @param id   - id помещения
+     * @param id            - id помещения
      * @param updateRequest - обновление помещения
      * @return - обновленное помещение
      */
@@ -51,4 +52,6 @@ public interface RoomService {
      * @param id - id помещения
      */
     void delete(@NotNull UUID id);
+
+    Room getRoomWithNullCheck(UUID id);
 }

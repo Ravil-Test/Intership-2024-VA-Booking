@@ -5,6 +5,7 @@ import org.springframework.lang.NonNull;
 import ru.irlix.booking.dto.office.OfficeCreateRequest;
 import ru.irlix.booking.dto.office.OfficeResponse;
 import ru.irlix.booking.dto.office.OfficeUpdateRequest;
+import ru.irlix.booking.entity.Office;
 
 import java.util.List;
 import java.util.UUID;
@@ -52,4 +53,6 @@ public interface OfficeService {
      * @param id - id офиса
      */
     void delete(@NotNull UUID id);
+
+    Office getOfficeWithNullCheck(UUID id);
 }

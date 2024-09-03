@@ -30,4 +30,21 @@
         </createTable>
 
     </changeSet>
+
+    <changeSet id="2024-08-28-add-foreignkey-workplace-room" author="Kirill_Mamonov">
+
+        <preConditions>
+            <tableExists tableName="workplace"/>
+            <tableExists tableName="room"/>
+        </preConditions>
+
+        <addColumn tableName="workplace">
+            <column name="room_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_room_workplace_into_workplace_table"
+                             references="room(id)"/>
+            </column>
+        </addColumn>
+
+    </changeSet>
+
 </databaseChangeLog>

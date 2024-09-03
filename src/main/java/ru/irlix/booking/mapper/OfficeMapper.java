@@ -14,18 +14,21 @@ import java.util.List;
 /**
  * Маппер для офиса
  */
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.ERROR, uses = RoomMapper.class)
 public interface OfficeMapper {
 
-    @Mapping(target = "isDelete", ignore = true)
+
+    @Mapping(target = "isDelete", source = "delete")
     OfficeResponse entityToResponse(Office office);
 
-    @Mapping(target = "id", ignore = true)
     @Mapping(target = "delete", ignore = true)
+    @Mapping(target = "rooms", ignore = true)
+    @Mapping(target = "id", ignore = true)
     Office createRequestToEntity(OfficeCreateRequest createRequest);
 
-    @Mapping(target = "id", ignore = true)
     @Mapping(target = "delete", ignore = true)
+    @Mapping(target = "rooms", ignore = true)
+    @Mapping(target = "id", ignore = true)
     Office updateRequestToEntity(OfficeUpdateRequest updateRequest);
 
     List<OfficeResponse> entityListToResponseList(List<Office> offices);

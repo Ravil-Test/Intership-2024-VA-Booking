@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.irlix.booking.dto.office.OfficeCreateRequest;
 import ru.irlix.booking.dto.office.OfficeResponse;
 import ru.irlix.booking.dto.office.OfficeUpdateRequest;
@@ -50,10 +51,10 @@ public class OfficeServiceImpl implements OfficeService {
     @Override
     public OfficeResponse update(UUID id, @NonNull OfficeUpdateRequest updateRequest) {
         Office currentOffice = getOfficeWithNullCheck(id);
-        Office updateForOffice = officeMapper.updateRequestToEntity(updateRequest);
+        Office update = officeMapper.updateRequestToEntity(updateRequest);
 
-        Optional.ofNullable(updateForOffice.getName()).ifPresent(currentOffice::setName);
-        Optional.ofNullable(updateForOffice.getAddress()).ifPresent(currentOffice::setAddress);
+        Optional.ofNullable(update.getName()).ifPresent(currentOffice::setName);
+        Optional.ofNullable(update.getAddress()).ifPresent(currentOffice::setAddress);
 
         Office changedOffice = officeRepository.save(currentOffice);
         log.info("Updated office with id: {} : {}", id, changedOffice);
@@ -62,6 +63,7 @@ public class OfficeServiceImpl implements OfficeService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID id) {
         officeRepository.changeOfficeIsDelete(id, true);
         log.info("Deleted office with id : {}", id);
@@ -73,7 +75,8 @@ public class OfficeServiceImpl implements OfficeService {
      * @param id - id офиса
      * @return - найденный офис
      */
-    private Office getOfficeWithNullCheck(UUID id) {
+    @Override
+    public Office getOfficeWithNullCheck(UUID id) {
         return officeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Office with id " + id + " not found"));
     }

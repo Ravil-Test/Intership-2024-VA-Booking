@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.irlix.booking.dto.booking.BookingCancelRequest;
 import ru.irlix.booking.dto.booking.BookingCreateRequest;
 import ru.irlix.booking.dto.booking.BookingResponse;
-import ru.irlix.booking.dto.booking.BookingCancelRequest;
 import ru.irlix.booking.service.BookingService;
 
 import java.util.List;
