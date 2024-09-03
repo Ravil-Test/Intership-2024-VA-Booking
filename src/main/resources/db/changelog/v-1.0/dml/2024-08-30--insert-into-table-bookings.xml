@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="2024-08-30-insert-into-table-bookings.xml" author="Ravil_Nurullin">
+
+        <preConditions>
+            <tableExists tableName="booking"/>
+        </preConditions>
+
+        <insert tableName="booking">
+            <column name="id" value="00000000-0000-0000-1111-111111111111"/>
+            <column name="booking_date_time" value="2024-08-30 12:11:50.077721"/>
+            <column name="booking_start_date_time" value="2024-08-31 08:00:00.000000"/>
+            <column name="booking_end_date_time" value="2024-08-31 20:00:00.000000"/>
+            <column name="booking_cancel_date_time" value="2024-08-31 12:11:50.077721"/>
+            <column name="booking_cancel_reason" value="Booking canceled by Administrator. Reason: 1"/>
+            <column name="is_booked" value="false"/>
+        </insert>
+        <insert tableName="booking">
+            <column name="id" value="00000000-0000-0000-1111-222222222222"/>
+            <column name="booking_date_time" value="2024-08-30 12:11:50.077721"/>
+            <column name="booking_start_date_time" value="2024-08-31 08:00:00.000000"/>
+            <column name="booking_end_date_time" value="2024-08-31 20:00:00.000000"/>
+            <column name="booking_cancel_date_time" value="2024-08-31 12:11:50.077721"/>
+            <column name="booking_cancel_reason" value="Booking canceled by Administrator. Reason: 2"/>
+            <column name="is_booked" value="false"/>
+        </insert>
+        <insert tableName="booking">
+            <column name="id" value="00000000-0000-0000-1111-333333333333"/>
+            <column name="booking_date_time" value="2024-08-30 12:11:50.077721"/>
+            <column name="booking_start_date_time" value="2024-08-31 08:00:00.000000"/>
+            <column name="booking_end_date_time" value="2024-08-31 20:00:00.000000"/>
+            <column name="booking_cancel_date_time" value="2024-08-31 12:11:50.077721"/>
+            <column name="booking_cancel_reason" value="Booking canceled by Administrator. Reason: 3"/>
+            <column name="is_booked" value="false"/>
+        </insert>
+
+    </changeSet>
+
+</databaseChangeLog>

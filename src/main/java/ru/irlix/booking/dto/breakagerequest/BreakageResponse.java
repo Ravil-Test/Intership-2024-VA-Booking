@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 public record BreakageResponse(
 
         @Schema(title = "Время создания заявки", example = "2024-08-30 12:11:50.077721")
-        @JsonProperty(value = "requestDate")
-        LocalDateTime requestDate,
+        @JsonProperty(value = "requestDateTime")
+        LocalDateTime requestDateTime,
 
         @Schema(title = "Описание заявки", example = "Hello, I need help, my monitor doesn't works!")
         @JsonProperty(value = "description")
