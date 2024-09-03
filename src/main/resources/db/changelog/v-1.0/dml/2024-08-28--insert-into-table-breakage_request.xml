@@ -13,7 +13,7 @@
 
         <insert tableName="breakage_request">
             <column name="id" value="00000000-0000-0000-0000-111111111111"/>
-            <column name="request_datetime" value="NOW()"/>
+            <column name="request_date_time" value="NOW()"/>
             <column name="description" value="Test breakage №1"/>
             <column name="is_completed" value="false"/>
             <column name="is_canceled" value="false"/>
@@ -21,7 +21,7 @@
 
         <insert tableName="breakage_request">
             <column name="id" value="00000000-0000-0000-0000-222222222222"/>
-            <column name="request_datetime" value="NOW()"/>
+            <column name="request_date_time" value="NOW()"/>
             <column name="description" value="Test breakage №2"/>
             <column name="is_completed" value="false"/>
             <column name="is_canceled" value="false"/>

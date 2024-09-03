@@ -34,8 +34,8 @@ public class BreakageRequest {
     private UUID id;
 
     @Schema(title = "Время создания заявки о поломке", example = "2024-08-30 12:11:50.077721")
-    @Column(name = "request_datetime", nullable = false)
-    private LocalDateTime requestDate;
+    @Column(name = "request_date_time", nullable = false)
+    private LocalDateTime requestDateTime;
 
     @Schema(title = "Описание заявки о поломке", example = "Hello, I need help, my monitor doesn't works!")
     @Column(name = "description", nullable = false)
