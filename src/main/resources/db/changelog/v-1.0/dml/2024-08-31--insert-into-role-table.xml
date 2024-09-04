@@ -1,0 +1,24 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="2024-08-31--create-table-role" author="Alexandr_Makutsevich">
+
+        <preConditions>
+            <tableExists tableName="role"/>
+        </preConditions>
+
+        <insert tableName="role">
+            <column name="id" value="14141414-1414-1414-1414-141414141414"/>
+            <column name="name" value="ADMIN"/>
+        </insert>
+
+        <insert tableName="role">
+            <column name="id" value="15151515-1515-1515-1515-151515151515"/>
+            <column name="name" value="USER"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

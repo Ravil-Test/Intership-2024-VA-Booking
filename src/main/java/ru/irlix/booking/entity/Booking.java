@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,6 +23,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = {"id", "cancelReason"})
 @Table(name = "booking")
 public class Booking {
 

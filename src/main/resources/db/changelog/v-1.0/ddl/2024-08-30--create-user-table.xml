@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="2024-08-30--create-table-user" author="Alexandr_Makutsevich">
+
+        <preConditions>
+            <not>
+                <tableExists tableName="user"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="user">
+            <column name="id" type="uuid">
+                <constraints nullable="true" primaryKey="true"/>
+            </column>
+            <column name="fio" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number" type="TEXT">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="email" type="TEXT">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="available_minutes_for_booking" type="int" defaultValueNumeric="30">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_delete" type="boolean" defaultValueBoolean="false"/>
+        </createTable>
+
+    </changeSet>
+
+</databaseChangeLog>
