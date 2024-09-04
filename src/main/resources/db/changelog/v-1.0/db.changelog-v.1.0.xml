@@ -8,13 +8,17 @@
     <include file="ddl/2024-08-26--create-office-table.xml" relativeToChangelogFile="true"/>
     <include file="ddl/2024-08-27--create-room-table.xml" relativeToChangelogFile="true"/>
     <include file="ddl/2024-08-28--create-workplace-table.xml" relativeToChangelogFile="true"/>
+    <include file="ddl/2024-08-28--create-table-breakage_request.xml" relativeToChangelogFile="true"/>
+    <include file="ddl/2024-08-30--create-table-bookings.xml" relativeToChangelogFile="true"/>
+    <include file="ddl/2024-08-30--create-user-table.xml" relativeToChangelogFile="true"/>
+    <include file="ddl/2024-08-31--create-role-table.xml" relativeToChangelogFile="true"/>
 
     <include file="dml/2024-08-26--insert-into-office-table.xml" relativeToChangelogFile="true"/>
     <include file="dml/2024-08-27--insert-into-room-table.xml" relativeToChangelogFile="true"/>
     <include file="dml/2024-08-28--insert-into-workplace-table.xml" relativeToChangelogFile="true"/>
-    <include file="ddl/2024-08-28--create-table-breakage_request.xml" relativeToChangelogFile="true"/>
     <include file="dml/2024-08-28--insert-into-table-breakage_request.xml" relativeToChangelogFile="true"/>
-    <include file="ddl/2024-08-30--create-table-bookings.xml" relativeToChangelogFile="true"/>
     <include file="dml/2024-08-30--insert-into-table-bookings.xml" relativeToChangelogFile="true"/>
+    <include file="dml/2024-08-30--insert-into-user-table.xml" relativeToChangelogFile="true"/>
+    <include file="dml/2024-08-31--insert-into-role-table.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

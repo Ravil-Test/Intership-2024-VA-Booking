@@ -2,6 +2,7 @@ package ru.irlix.booking.service;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.NonNull;
+import org.springframework.transaction.annotation.Transactional;
 import ru.irlix.booking.dto.room.RoomCreateRequest;
 import ru.irlix.booking.dto.room.RoomResponse;
 import ru.irlix.booking.dto.room.RoomUpdateRequest;
@@ -51,6 +52,7 @@ public interface RoomService {
      *
      * @param id - id помещения
      */
+    @Transactional
     void delete(@NotNull UUID id);
 
     Room getRoomWithNullCheck(UUID id);

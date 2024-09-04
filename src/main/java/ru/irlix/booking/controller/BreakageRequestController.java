@@ -26,7 +26,7 @@ import java.util.UUID;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/breakage")
+@RequestMapping("/breakages")
 @Tag(name = "Контроллер заявок о поломках")
 public class BreakageRequestController {
 

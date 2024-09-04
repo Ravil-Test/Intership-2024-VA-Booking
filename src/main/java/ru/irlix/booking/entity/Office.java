@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +26,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = {"id", "address", "name"})
 @Table(name = "office")
 public class Office {
 
@@ -67,5 +69,4 @@ public class Office {
      */
     @OneToMany(mappedBy = "office", cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     private List<Room> rooms;
-
 }
