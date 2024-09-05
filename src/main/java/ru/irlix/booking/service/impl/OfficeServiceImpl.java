@@ -3,6 +3,9 @@ package ru.irlix.booking.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +16,7 @@ import ru.irlix.booking.entity.Office;
 import ru.irlix.booking.mapper.OfficeMapper;
 import ru.irlix.booking.repository.OfficeRepository;
 import ru.irlix.booking.service.OfficeService;
+import ru.irlix.booking.service.specification.OfficeSpecifications;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +40,19 @@ public class OfficeServiceImpl implements OfficeService {
     @Override
     public List<OfficeResponse> getAll() {
         return officeMapper.entityListToResponseList(officeRepository.findAll());
+    }
+
+    @Override
+    public Page<OfficeResponse> getAllWithPagingAndSoring(String name, Boolean isDelete, Pageable pageable) {
+        if ((name == null || name.isEmpty()) && isDelete == null) {
+            return officeRepository.findAll(pageable).map(officeMapper::entityToResponse);
+        }
+
+        Specification<Office> spec = Specification
+                .where(name != null && !name.isEmpty() ? OfficeSpecifications.hasName(name) : null)
+                .and(isDelete != null ? OfficeSpecifications.isDeleted(isDelete) : null);
+
+        return officeRepository.findAll(spec, pageable).map(officeMapper::entityToResponse);
     }
 
     @Override

@@ -41,6 +41,7 @@ public class WorkplaceServiceImpl implements WorkplaceService {
         return workplaceMapper.entityListToReponseList(workplaceRepository.findAll());
     }
 
+
     @Override
     public WorkplaceResponse save(@NonNull WorkplaceCreateRequest createRequest) {
         Workplace forSave = workplaceMapper.createRequestToEntity(createRequest);
