@@ -1,6 +1,8 @@
 package ru.irlix.booking.service;
 
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import ru.irlix.booking.dto.office.OfficeCreateRequest;
 import ru.irlix.booking.dto.office.OfficeResponse;
@@ -29,6 +31,16 @@ public interface OfficeService {
      * @return - список офисов
      */
     List<OfficeResponse> getAll();
+
+    /**
+     * Получить офисы с пагинацией и сортировкой
+     *
+     * @param name     - название офиса
+     * @param isDelete - статус офиса (удален/не удален
+     * @param pageable - настройки пагинации
+     * @return - страница с офисами
+     */
+    Page<OfficeResponse> getAllWithPagingAndSoring(String name, Boolean isDelete, Pageable pageable);
 
     /**
      * Создать офис

@@ -17,7 +17,6 @@ import java.util.List;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.ERROR, uses = RoomMapper.class)
 public interface OfficeMapper {
 
-
     @Mapping(target = "isDelete", source = "delete")
     OfficeResponse entityToResponse(Office office);
 

@@ -1,10 +1,15 @@
 package ru.irlix.booking.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 import ru.irlix.booking.dto.office.OfficeCreateRequest;
+import ru.irlix.booking.dto.office.OfficeResponse;
 import ru.irlix.booking.dto.office.OfficeUpdateRequest;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -22,6 +27,28 @@ class OfficeControllerTest extends BaseIntegrationTest {
         mockMvc.perform(get("/offices"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    void getOfficePageTest_shouldReturnPageOfOffices() throws Exception {
+        OfficeResponse expectedOffice = new OfficeResponse("123 Main St, Springfield", "Head Office", false);
+
+        MvcResult mvcResult = mockMvc.perform(get("/offices/find")
+                        .param("name", "Head Office")
+                        .param("isDelete", "false")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "name"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String contentResponse = mvcResult.getResponse().getContentAsString();
+
+        List<OfficeResponse> contentList = getMapper().readValue(getMapper().readTree(contentResponse).get("content").toString(),
+                new TypeReference<>() {
+                });
+
+        Assertions.assertEquals(expectedOffice, contentList.get(0));
     }
 
     @Test
