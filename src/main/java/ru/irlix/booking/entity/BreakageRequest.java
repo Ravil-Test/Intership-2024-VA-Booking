@@ -2,10 +2,13 @@ package ru.irlix.booking.entity;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,7 +28,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"id", "description"})
+@ToString(exclude = {"id", "description", "workplace"})
 @Table(name = "breakage_request")
 public class BreakageRequest {
 
@@ -50,4 +53,8 @@ public class BreakageRequest {
     @Schema(title = "Статус отмены заявки о поломке", example = "false")
     @Column(name = "is_canceled")
     private boolean isCanceled;
+
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "workplace_id", referencedColumnName = "id")
+    private Workplace workplace;
 }

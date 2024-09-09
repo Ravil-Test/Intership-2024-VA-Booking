@@ -1,10 +1,13 @@
 package ru.irlix.booking.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,7 +26,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"id", "cancelReason"})
+@ToString(exclude = {"id", "cancelReason", "workplace"})
 @Table(name = "booking")
 public class Booking {
 
@@ -62,4 +65,8 @@ public class Booking {
     @Column(name = "is_booked", nullable = false)
     @Schema(title = "Статус бронирования", example = "false")
     private boolean isBooked;
+
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "workplace_id", referencedColumnName = "id")
+    private Workplace workplace;
 }

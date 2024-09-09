@@ -25,10 +25,14 @@ public interface WorkplaceMapper {
     @Mapping(target = "room", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "delete", ignore = true)
+    @Mapping(target = "bookings", ignore = true)
+    @Mapping(target = "breakageRequests", ignore = true)
     Workplace createRequestToEntity(WorkplaceCreateRequest createRequest);
 
     @Mapping(target = "room", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "delete", ignore = true)
+    @Mapping(target = "bookings", ignore = true)
+    @Mapping(target = "breakageRequests", ignore = true)
     Workplace updateRequestToEntity(WorkplaceUpdateRequest updateRequest);
 }
