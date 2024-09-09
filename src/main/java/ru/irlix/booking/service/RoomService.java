@@ -1,10 +1,13 @@
 package ru.irlix.booking.service;
 
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import ru.irlix.booking.dto.room.RoomCreateRequest;
 import ru.irlix.booking.dto.room.RoomResponse;
+import ru.irlix.booking.dto.room.RoomSearchRequest;
 import ru.irlix.booking.dto.room.RoomUpdateRequest;
 import ru.irlix.booking.entity.Room;
 
@@ -55,5 +58,20 @@ public interface RoomService {
     @Transactional
     void delete(@NotNull UUID id);
 
-    Room getRoomWithNullCheck(UUID id);
+    /**
+     * Получить помещение и проверить на null
+     *
+     * @param id - id помещения
+     * @return - найденное помещение
+     */
+    Room getRoomWithNullCheck(@NotNull UUID id);
+
+    /**
+     * Получить страницу со списком помещений с фильтром
+     *
+     * @param searchRequest - фильтр
+     * @param pageable      - пагинация
+     * @return - страница со списком помещений
+     */
+    Page<RoomResponse> getRoomsWithFilters(RoomSearchRequest searchRequest, Pageable pageable);
 }

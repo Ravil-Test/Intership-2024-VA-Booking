@@ -1,4 +1,4 @@
-package ru.irlix.booking.service.specification;
+package ru.irlix.booking.specification;
 
 import org.springframework.data.jpa.domain.Specification;
 import ru.irlix.booking.entity.Office;

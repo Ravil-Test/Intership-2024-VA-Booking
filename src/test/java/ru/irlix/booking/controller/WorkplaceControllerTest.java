@@ -1,7 +1,10 @@
 package ru.irlix.booking.controller;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.irlix.booking.dto.workplace.WorkplaceCreateRequest;
 import ru.irlix.booking.dto.workplace.WorkplaceUpdateRequest;
@@ -15,17 +18,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@DisplayName(value = "Тесты контроллера рабочих мест")
 class WorkplaceControllerTest extends BaseIntegrationTest {
 
     @Test
-    void getAllTest_shouldReturnWorkplaceList() throws Exception {
+    @DirtiesContext
+    @Tag(value = "Позитивный")
+    @DisplayName(value = "Тест на получение списка рабочих мест")
+    void getAllTest_success() throws Exception {
         mockMvc.perform(get("/workplaces"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }
 
     @Test
-    void getWorkplaceByIdTest_shouldReturnWorkplaceById() throws Exception {
+    @DirtiesContext
+    @Tag(value = "Позитивный")
+    @DisplayName(value = "Тест на получение рабочего места по id")
+    void getWorkplaceByIdTest_success() throws Exception {
         UUID id = UUID.fromString("77777777-7777-7777-7777-777777777777");
         mockMvc.perform(get("/workplaces/{id}", id))
                 .andExpect(status().isOk())
@@ -35,7 +45,10 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    void createWorkplaceTest_shouldCreateNewWorkplace_and_shouldReturnCreatedWorkplace() throws Exception {
+    @DirtiesContext
+    @Tag(value = "Позитивный")
+    @DisplayName(value = "Тест на создание рабочего места")
+    void createWorkplaceTest_success() throws Exception {
         UUID roomId = UUID.fromString("55555555-5555-5555-5555-555555555555");
         WorkplaceCreateRequest createRequest = new WorkplaceCreateRequest(5, "Create test description", roomId);
         String jsonCreateRequest = getMapper().writeValueAsString(createRequest);
@@ -49,7 +62,10 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    void updateWorkplaceTest_shouldUpdateWorkplaceById_and_shouldReturnUpdatedWorkplace() throws Exception {
+    @DirtiesContext
+    @Tag(value = "Позитивный")
+    @DisplayName(value = "Тест на обновление рабочего места")
+    void updateWorkplaceTest_success() throws Exception {
         UUID workplaceId = UUID.fromString("88888888-8888-8888-8888-888888888888");
         UUID roomId = UUID.fromString("66666666-6666-6666-6666-666666666666");
 
@@ -65,7 +81,10 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    void deleteWorkplaceTest_shouldSetIsDeleteWorkplaceTrue() throws Exception {
+    @DirtiesContext
+    @Tag(value = "Позитивный")
+    @DisplayName(value = "Тест на удаление рабочего места")
+    void deleteWorkplaceTest_success() throws Exception {
         UUID id = UUID.fromString("99999999-9999-9999-9999-999999999999");
 
         mockMvc.perform(delete("/workplaces/{id}", id))
@@ -78,7 +97,10 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    void notFoundTest_shouldReturnNotFound() throws Exception {
+    @DirtiesContext
+    @Tag(value = "Негативный")
+    @DisplayName(value = "Тест получение рабочего места по id")
+    void notFoundTest_notFound() throws Exception {
         mockMvc.perform(get("/workplaces/{id}", UUID.randomUUID()))
                 .andExpect(status().isNotFound());
     }

@@ -16,7 +16,7 @@ import ru.irlix.booking.entity.Office;
 import ru.irlix.booking.mapper.OfficeMapper;
 import ru.irlix.booking.repository.OfficeRepository;
 import ru.irlix.booking.service.OfficeService;
-import ru.irlix.booking.service.specification.OfficeSpecifications;
+import ru.irlix.booking.specification.OfficeSpecifications;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,11 +1,14 @@
 package ru.irlix.booking.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.irlix.booking.dto.room.RoomCreateRequest;
 import ru.irlix.booking.dto.room.RoomResponse;
+import ru.irlix.booking.dto.room.RoomSearchRequest;
 import ru.irlix.booking.dto.room.RoomUpdateRequest;
 import ru.irlix.booking.service.RoomService;
 
@@ -43,6 +47,20 @@ public class RoomController {
     })
     public List<RoomResponse> getAll() {
         return roomService.getAll();
+    }
+
+    @PostMapping("/search")
+    @Operation(summary = "Получить страницу со списком помещений",
+            description = "Возвращает статус 200 и страницу с помещениями")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Запрос прошел успешно"),
+            @ApiResponse(responseCode = "403", description = "Недостаточно прав"),
+            @ApiResponse(responseCode = "400", description = "Некорректно переданные параметры")
+    })
+    public Page<RoomResponse> getRooms(
+            @RequestBody(required = false) @Parameter(description = "Фильтр для запроса") @Valid RoomSearchRequest searchRequest,
+            Pageable pageable) {
+        return roomService.getRoomsWithFilters(searchRequest, pageable);
     }
 
     @GetMapping("/{id}")
