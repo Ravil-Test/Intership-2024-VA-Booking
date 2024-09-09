@@ -28,7 +28,6 @@ import java.util.UUID;
 @ToString(exclude = {"id", "number"})
 @Table(name = "workplace")
 public class Workplace {
-
     /**
      * Идентификатор рабочего места
      */

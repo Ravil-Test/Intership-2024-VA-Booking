@@ -4,16 +4,22 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import ru.irlix.booking.dto.room.RoomCreateRequest;
 import ru.irlix.booking.dto.room.RoomResponse;
+import ru.irlix.booking.dto.room.RoomSearchRequest;
 import ru.irlix.booking.dto.room.RoomUpdateRequest;
 import ru.irlix.booking.entity.Room;
 import ru.irlix.booking.mapper.RoomMapper;
 import ru.irlix.booking.repository.RoomRepository;
 import ru.irlix.booking.service.OfficeService;
 import ru.irlix.booking.service.RoomService;
+import ru.irlix.booking.specification.RoomSpecification;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +45,33 @@ public class RoomServiceImpl implements RoomService {
     public List<RoomResponse> getAll() {
         return roomMapper
                 .entityListToResponseList(roomRepository.findAll());
+    }
+
+    @Override
+    public Page<RoomResponse> getRoomsWithFilters(RoomSearchRequest searchRequest, Pageable pageable) {
+        Specification<Room> spec = Specification.where(null);
+
+        if (StringUtils.hasText(searchRequest.name())) {
+            spec = spec.and(RoomSpecification.hasName(searchRequest.name()));
+        }
+        if (searchRequest.isDelete() != null) {
+            spec = spec.and(RoomSpecification.isDeleted(searchRequest.isDelete()));
+        }
+        if (searchRequest.floorNumber() != null) {
+            spec = spec.and(RoomSpecification.hasFloorNumber(searchRequest.floorNumber()));
+        }
+        if (searchRequest.roomNumber() != null) {
+            spec = spec.and(RoomSpecification.hasRoomNumber(searchRequest.roomNumber()));
+        }
+        if (searchRequest.officeId() != null) {
+            spec = spec.and(RoomSpecification.hasOfficeId(searchRequest.officeId()));
+        }
+
+        Page<Room> roomPage = roomRepository.findAll(spec, pageable);
+        if (!roomPage.hasContent())
+            throw new EntityNotFoundException("Записей с таким фильтром не найдено");
+
+        return roomPage.map(roomMapper::entityToResponse);
     }
 
     @Override
@@ -74,7 +107,8 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     public void delete(UUID id) {
-        roomRepository.changeRoomIsDeleted(id, true);
+        if (getRoomWithNullCheck(id) != null)
+            roomRepository.changeRoomIsDeleted(id, true);
         log.info("Помещение с id {} удалено", id);
     }
 
