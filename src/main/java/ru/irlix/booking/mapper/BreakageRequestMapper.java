@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Маппер для заявок о поломках
  */
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.ERROR, uses = WorkplaceMapper.class)
 public interface BreakageRequestMapper {
 
     @Mapping(target = "isComplete", ignore = true)
@@ -25,12 +25,14 @@ public interface BreakageRequestMapper {
     @Mapping(target = "complete", ignore = true)
     @Mapping(target = "canceled", ignore = true)
     @Mapping(target = "requestDateTime", expression = "java(LocalDateTime.now())")
+    @Mapping(target = "workplace", ignore = true)
     BreakageRequest createRequestToEntity(BreakageRequestCreate createBreakageRequest);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "complete", ignore = true)
     @Mapping(target = "canceled", ignore = true)
     @Mapping(target = "requestDateTime", expression = "java(LocalDateTime.now())")
+    @Mapping(target = "workplace", ignore = true)
     BreakageRequest updateRequestToEntity(BreakageRequestUpdate updateBreakageRequest);
 
     List<BreakageResponse> entityToResponse(List<BreakageRequest> breakageRequests);

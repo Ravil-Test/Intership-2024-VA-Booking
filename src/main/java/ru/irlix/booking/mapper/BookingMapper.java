@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Маппер для бронирования
  */
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.ERROR, uses = WorkplaceMapper.class)
 public interface BookingMapper {
 
     @Mapping(source = "booked", target = "isBooked")
@@ -24,6 +24,7 @@ public interface BookingMapper {
     @Mapping(target = "bookingDateTime", expression = "java(LocalDateTime.now())")
     @Mapping(target = "bookingCancelDateTime", ignore = true)
     @Mapping(target = "cancelReason", ignore = true)
+    @Mapping(target = "workplace", ignore = true)
     @Mapping(target = "booked", ignore = true)
     Booking createRequestToEntity(BookingCreateRequest createRequest);
 
@@ -32,6 +33,7 @@ public interface BookingMapper {
     @Mapping(target = "bookingStartDateTime", ignore = true)
     @Mapping(target = "bookingCancelDateTime", expression = "java(LocalDateTime.now())")
     @Mapping(target = "bookingEndDateTime", ignore = true)
+    @Mapping(target = "workplace", ignore = true)
     @Mapping(target = "booked", ignore = true)
     Booking cancelRequestToEntity(BookingCancelRequest cancelRequest);
 
