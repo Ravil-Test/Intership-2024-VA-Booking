@@ -1,9 +1,12 @@
 package ru.irlix.booking.service;
 
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import ru.irlix.booking.dto.workplace.WorkplaceCreateRequest;
 import ru.irlix.booking.dto.workplace.WorkplaceResponse;
+import ru.irlix.booking.dto.workplace.WorkplaceSearchRequest;
 import ru.irlix.booking.dto.workplace.WorkplaceUpdateRequest;
 
 import java.util.List;
@@ -52,4 +55,13 @@ public interface WorkplaceService {
      * @param id - id рабочего места
      */
     void delete(@NotNull UUID id);
+
+    /**
+     * Получить страницу с рабочими местами
+     *
+     * @param searchRequest - фильтр записей
+     * @param pageable      - пагинация
+     * @return - страница с рабочими местами
+     */
+    Page<WorkplaceResponse> search(WorkplaceSearchRequest searchRequest, Pageable pageable);
 }

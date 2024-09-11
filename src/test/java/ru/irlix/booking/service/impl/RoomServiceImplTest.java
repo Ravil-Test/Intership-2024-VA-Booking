@@ -11,7 +11,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import ru.irlix.booking.controller.BaseIntegrationTest;
 import ru.irlix.booking.dto.room.RoomCreateRequest;
 import ru.irlix.booking.dto.room.RoomResponse;
 import ru.irlix.booking.dto.room.RoomSearchRequest;
@@ -19,6 +18,7 @@ import ru.irlix.booking.dto.room.RoomUpdateRequest;
 import ru.irlix.booking.entity.Room;
 import ru.irlix.booking.repository.RoomRepository;
 import ru.irlix.booking.service.RoomService;
+import ru.irlix.booking.util.BaseIntegrationTest;
 
 import java.util.List;
 import java.util.Optional;

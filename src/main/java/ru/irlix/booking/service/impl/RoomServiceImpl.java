@@ -79,7 +79,7 @@ public class RoomServiceImpl implements RoomService {
     public RoomResponse save(@NonNull RoomCreateRequest createRequest) {
         Room createRoom = roomMapper.createRequestToEntity(createRequest);
 
-        createRoom.setOffice(officeService.getOfficeWithNullCheck(createRequest.officeId()));
+        createRoom.setOffice(officeService.optionalCheck(createRequest.officeId()));
 
         Room saveRoom = roomRepository.save(createRoom);
         log.info("Создание помещения {}", createRoom);
@@ -93,7 +93,7 @@ public class RoomServiceImpl implements RoomService {
         Room updateRoom = roomMapper.updateRequestToEntity(updateRequest);
 
         if (Optional.ofNullable(updateRequest.officeId()).isPresent())
-            updateRoom.setOffice(officeService.getOfficeWithNullCheck(updateRequest.officeId()));
+            updateRoom.setOffice(officeService.optionalCheck(updateRequest.officeId()));
         Optional.ofNullable(updateRoom.getName()).ifPresent(currentRoom::setName);
         Optional.ofNullable(updateRoom.getFloorNumber()).ifPresent(currentRoom::setFloorNumber);
         Optional.ofNullable(updateRoom.getRoomNumber()).ifPresent(currentRoom::setRoomNumber);

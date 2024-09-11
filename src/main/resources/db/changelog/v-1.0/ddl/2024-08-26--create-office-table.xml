@@ -17,7 +17,7 @@
             <column name="id" type="uuid">
                 <constraints nullable="true" primaryKey="true"/>
             </column>
-            <column name="name" type="text">
+            <column name="name" type="text" >
                 <constraints nullable="false"/>
             </column>
             <column name="address" type="text">

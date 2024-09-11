@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -18,11 +19,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.irlix.booking.dto.office.OfficeCreateRequest;
 import ru.irlix.booking.dto.office.OfficeResponse;
+import ru.irlix.booking.dto.office.OfficeSearchRequest;
 import ru.irlix.booking.dto.office.OfficeUpdateRequest;
 import ru.irlix.booking.service.OfficeService;
 
@@ -49,7 +50,7 @@ public class OfficeController {
         return officeService.getAll();
     }
 
-    @GetMapping("/find")
+    @GetMapping("/search")
     @Operation(summary = "Получить список офисов с пагинацией и сортировкой",
             description = "Возвращает статус 200 и список офисов")
     @ApiResponses(value = {
@@ -57,10 +58,9 @@ public class OfficeController {
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
     public Page<OfficeResponse> getOfficePage(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) Boolean isDelete,
+            @RequestBody @Param(value = "Фильтр") @Valid OfficeSearchRequest searchRequest,
             @PageableDefault(sort = "name") Pageable pageable) {
-        return officeService.getAllWithPagingAndSoring(name, isDelete, pageable);
+        return officeService.getAllWithPagingAndSorting(searchRequest, pageable);
     }
 
     @GetMapping("/{id}")

@@ -1,11 +1,14 @@
 package ru.irlix.booking.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.irlix.booking.dto.workplace.WorkplaceCreateRequest;
 import ru.irlix.booking.dto.workplace.WorkplaceResponse;
+import ru.irlix.booking.dto.workplace.WorkplaceSearchRequest;
 import ru.irlix.booking.dto.workplace.WorkplaceUpdateRequest;
 import ru.irlix.booking.service.WorkplaceService;
 
@@ -45,6 +49,19 @@ public class WorkplaceController {
         return workplaceService.getAll();
     }
 
+    @GetMapping("/search")
+    @Operation(summary = "Получить список рабочих мест",
+            description = "Возвращает статус 200 и список рабочих мест")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Запрос прошел успешно"),
+            @ApiResponse(responseCode = "403", description = "Недостаточно прав"),
+            @ApiResponse(responseCode = "404", description = "Записей с таким фильтром не найдено")
+    })
+    public Page<WorkplaceResponse> search(@RequestBody(required = false) @Parameter(description = "Фильтр записей")
+                                             @Valid WorkplaceSearchRequest searchRequest, Pageable pageable) {
+        return workplaceService.search(searchRequest, pageable);
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Получить рабочее место по id",
             description = "Возвращает статус 200 и найденное рабочее место")
@@ -53,7 +70,7 @@ public class WorkplaceController {
             @ApiResponse(responseCode = "404", description = "Рабочее место не найдено"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public WorkplaceResponse getWorkplaceById(@PathVariable UUID id) {
+    public WorkplaceResponse getById(@PathVariable UUID id) {
         return workplaceService.getById(id);
     }
 
@@ -66,7 +83,7 @@ public class WorkplaceController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public WorkplaceResponse createWorkplace(@RequestBody @Valid WorkplaceCreateRequest createRequest) {
+    public WorkplaceResponse save(@RequestBody @Valid WorkplaceCreateRequest createRequest) {
         return workplaceService.save(createRequest);
     }
 
@@ -79,7 +96,7 @@ public class WorkplaceController {
             @ApiResponse(responseCode = "404", description = "Рабочее место не найдено"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public WorkplaceResponse updateWorkplace(@PathVariable UUID id, @RequestBody @Valid WorkplaceUpdateRequest updateRequest) {
+    public WorkplaceResponse update(@PathVariable UUID id, @RequestBody @Valid WorkplaceUpdateRequest updateRequest) {
         return workplaceService.update(id, updateRequest);
     }
 
@@ -89,10 +106,9 @@ public class WorkplaceController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Рабочее место удалено"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные"),
-            @ApiResponse(responseCode = "404", description = "Рабочее место не найдено"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public void deleteWorkplace(@PathVariable UUID id) {
+    public void delete(@PathVariable UUID id) {
         workplaceService.delete(id);
     }
 }

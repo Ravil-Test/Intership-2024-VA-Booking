@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import ru.irlix.booking.dto.office.OfficeCreateRequest;
 import ru.irlix.booking.dto.office.OfficeResponse;
+import ru.irlix.booking.dto.office.OfficeSearchRequest;
 import ru.irlix.booking.dto.office.OfficeUpdateRequest;
 import ru.irlix.booking.entity.Office;
 
@@ -33,16 +34,6 @@ public interface OfficeService {
     List<OfficeResponse> getAll();
 
     /**
-     * Получить офисы с пагинацией и сортировкой
-     *
-     * @param name     - название офиса
-     * @param isDelete - статус офиса (удален/не удален
-     * @param pageable - настройки пагинации
-     * @return - страница с офисами
-     */
-    Page<OfficeResponse> getAllWithPagingAndSoring(String name, Boolean isDelete, Pageable pageable);
-
-    /**
      * Создать офис
      *
      * @param createRequest - создаваемый офис
@@ -66,5 +57,20 @@ public interface OfficeService {
      */
     void delete(@NotNull UUID id);
 
-    Office getOfficeWithNullCheck(UUID id);
+    /**
+     * Получить офис на id с проверкой на null
+     *
+     * @param id - id офиса
+     * @return - найденный офис
+     */
+    Office optionalCheck(UUID id);
+
+    /**
+     * Получить страницу со списком офисов по фильтру
+     *
+     * @param searchRequest - фильтр
+     * @param pageable      - пагинация
+     * @return - страница со списков рабочих мест
+     */
+    Page<OfficeResponse> getAllWithPagingAndSorting(OfficeSearchRequest searchRequest, Pageable pageable);
 }
