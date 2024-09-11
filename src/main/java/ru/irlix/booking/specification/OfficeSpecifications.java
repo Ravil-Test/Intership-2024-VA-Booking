@@ -13,6 +13,10 @@ public class OfficeSpecifications {
     }
 
     public static Specification<Office> isDeleted(Boolean isDelete) {
-        return (root, query, cb) -> isDelete != null ? cb.equal(root.get("isDelete"), isDelete) : cb.conjunction();
+        return (root, query, cb) -> cb.equal(root.get("isDelete"), isDelete);
+    }
+
+    public static Specification<Office> hasAddress(String address) {
+        return (root, query, cb) -> cb.equal(root.get("address"), address);
     }
 }

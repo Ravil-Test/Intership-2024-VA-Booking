@@ -13,6 +13,7 @@ import ru.irlix.booking.dto.room.RoomCreateRequest;
 import ru.irlix.booking.dto.room.RoomResponse;
 import ru.irlix.booking.dto.room.RoomSearchRequest;
 import ru.irlix.booking.dto.room.RoomUpdateRequest;
+import ru.irlix.booking.util.BaseIntegrationTest;
 
 import java.util.List;
 import java.util.UUID;

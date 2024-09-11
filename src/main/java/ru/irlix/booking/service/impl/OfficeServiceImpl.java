@@ -9,8 +9,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import ru.irlix.booking.dto.office.OfficeCreateRequest;
 import ru.irlix.booking.dto.office.OfficeResponse;
+import ru.irlix.booking.dto.office.OfficeSearchRequest;
 import ru.irlix.booking.dto.office.OfficeUpdateRequest;
 import ru.irlix.booking.entity.Office;
 import ru.irlix.booking.mapper.OfficeMapper;
@@ -32,7 +34,7 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     public OfficeResponse getById(UUID id) {
-        Office foundOffice = getOfficeWithNullCheck(id);
+        Office foundOffice = optionalCheck(id);
         log.info("Get office with id: {} : {}", id, foundOffice);
         return officeMapper.entityToResponse(foundOffice);
     }
@@ -43,16 +45,22 @@ public class OfficeServiceImpl implements OfficeService {
     }
 
     @Override
-    public Page<OfficeResponse> getAllWithPagingAndSoring(String name, Boolean isDelete, Pageable pageable) {
-        if ((name == null || name.isEmpty()) && isDelete == null) {
-            return officeRepository.findAll(pageable).map(officeMapper::entityToResponse);
+    public Page<OfficeResponse> getAllWithPagingAndSorting(OfficeSearchRequest searchRequest, Pageable pageable) {
+        Specification<Office> spec = Specification.where(null);
+
+        if (StringUtils.hasText(searchRequest.address())) {
+            spec = spec.and(OfficeSpecifications.hasAddress(searchRequest.address()));
+        }
+        if (searchRequest.isDelete() != null) {
+            spec = spec.and(OfficeSpecifications.isDeleted(searchRequest.isDelete()));
+        }
+        if (StringUtils.hasText(searchRequest.name())) {
+            spec = spec.and(OfficeSpecifications.hasName(searchRequest.name()));
         }
 
-        Specification<Office> spec = Specification
-                .where(name != null && !name.isEmpty() ? OfficeSpecifications.hasName(name) : null)
-                .and(isDelete != null ? OfficeSpecifications.isDeleted(isDelete) : null);
+        Page<Office> responsePage = officeRepository.findAll(spec, pageable);
 
-        return officeRepository.findAll(spec, pageable).map(officeMapper::entityToResponse);
+        return responsePage.map(officeMapper::entityToResponse);
     }
 
     @Override
@@ -67,7 +75,7 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     public OfficeResponse update(UUID id, @NonNull OfficeUpdateRequest updateRequest) {
-        Office currentOffice = getOfficeWithNullCheck(id);
+        Office currentOffice = optionalCheck(id);
         Office update = officeMapper.updateRequestToEntity(updateRequest);
 
         Optional.ofNullable(update.getName()).ifPresent(currentOffice::setName);
@@ -93,7 +101,7 @@ public class OfficeServiceImpl implements OfficeService {
      * @return - найденный офис
      */
     @Override
-    public Office getOfficeWithNullCheck(UUID id) {
+    public Office optionalCheck(UUID id) {
         return officeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Office with id " + id + " not found"));
     }

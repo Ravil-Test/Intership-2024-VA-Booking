@@ -1,6 +1,7 @@
 package ru.irlix.booking.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,7 +14,7 @@ import java.util.UUID;
  * Репозиторий рабочего места
  */
 @Repository
-public interface WorkplaceRepository extends JpaRepository<Workplace, UUID> {
+public interface WorkplaceRepository extends JpaRepository<Workplace, UUID>, JpaSpecificationExecutor<Workplace> {
 
     /**
      * Изменить статус рабочего места на удален

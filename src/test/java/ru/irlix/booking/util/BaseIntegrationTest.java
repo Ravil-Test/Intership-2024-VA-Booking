@@ -1,4 +1,4 @@
-package ru.irlix.booking.controller;
+package ru.irlix.booking.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;

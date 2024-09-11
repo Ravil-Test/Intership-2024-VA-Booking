@@ -10,7 +10,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MvcResult;
 import ru.irlix.booking.dto.office.OfficeCreateRequest;
 import ru.irlix.booking.dto.office.OfficeResponse;
+import ru.irlix.booking.dto.office.OfficeSearchRequest;
 import ru.irlix.booking.dto.office.OfficeUpdateRequest;
+import ru.irlix.booking.util.BaseIntegrationTest;
 
 import java.util.List;
 import java.util.UUID;
@@ -41,13 +43,11 @@ class OfficeControllerTest extends BaseIntegrationTest {
     @DisplayName(value = "Тест на получение страницы со списком офисов")
     void getOfficePageTest_success() throws Exception {
         OfficeResponse expectedOffice = new OfficeResponse("123 Main St, Springfield", "Head Office", false);
+        String filter = getMapper().writeValueAsString(new OfficeSearchRequest("123 Main St, Springfield", "Head Office", null));
 
-        MvcResult mvcResult = mockMvc.perform(get("/offices/find")
-                        .param("name", "Head Office")
-                        .param("isDelete", "false")
-                        .param("page", "0")
-                        .param("size", "10")
-                        .param("sort", "name"))
+        MvcResult mvcResult = mockMvc.perform(get("/offices/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(filter))
                 .andExpect(status().isOk())
                 .andReturn();
 
