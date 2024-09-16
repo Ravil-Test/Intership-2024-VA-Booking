@@ -9,24 +9,30 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.irlix.booking.dto.user.UserCreateRequest;
 import ru.irlix.booking.dto.user.UserResponse;
 import ru.irlix.booking.dto.user.UserUpdateRequest;
+import ru.irlix.booking.entity.Role;
 import ru.irlix.booking.entity.User;
 import ru.irlix.booking.mapper.UserMapper;
 import ru.irlix.booking.repository.UserRepository;
+import ru.irlix.booking.service.RoleService;
 import ru.irlix.booking.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
+    private final static String DEFAULT_ROLE = "USER";
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final RoleService roleService;
+
 
     @Override
+    @Transactional
     public UserResponse getById(UUID id) {
         User user = getUserWithNullCheck(id);
         log.info("Получение пользователя по id: {} : {}", id, user);
@@ -34,20 +40,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public List<UserResponse> getAll() {
         return userMapper
                 .entityListToResponseList(userRepository.findAll());
     }
 
     @Override
+    @Transactional
     public UserResponse save(@NonNull UserCreateRequest createRequest) {
         User createUser = userMapper.createRequestToEntity(createRequest);
+
+        Role defaultRole = roleService.getRoleByName(DEFAULT_ROLE);
+        createUser.setRoles(Set.of(defaultRole));
+
         User saveUser = userRepository.save(createUser);
         log.info("Создание пользователя {}", createUser);
         return userMapper.entityToResponse(saveUser);
     }
 
     @Override
+    @Transactional
     public UserResponse update(UUID id, @NonNull UserUpdateRequest updateRequest) {
         User currentUser = getUserWithNullCheck(id);
         User updateUser = userMapper.updateRequestToEntity(updateRequest);

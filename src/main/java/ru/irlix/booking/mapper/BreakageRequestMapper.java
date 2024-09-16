@@ -26,6 +26,7 @@ public interface BreakageRequestMapper {
     @Mapping(target = "canceled", ignore = true)
     @Mapping(target = "requestDateTime", expression = "java(LocalDateTime.now())")
     @Mapping(target = "workplace", ignore = true)
+    @Mapping(target = "user", ignore = true)
     BreakageRequest createRequestToEntity(BreakageRequestCreate createBreakageRequest);
 
     @Mapping(target = "id", ignore = true)
@@ -33,6 +34,7 @@ public interface BreakageRequestMapper {
     @Mapping(target = "canceled", ignore = true)
     @Mapping(target = "requestDateTime", expression = "java(LocalDateTime.now())")
     @Mapping(target = "workplace", ignore = true)
+    @Mapping(target = "user", ignore = true)
     BreakageRequest updateRequestToEntity(BreakageRequestUpdate updateBreakageRequest);
 
     List<BreakageResponse> entityToResponse(List<BreakageRequest> breakageRequests);

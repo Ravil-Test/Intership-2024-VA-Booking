@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="2024-09-04-add-foreignkey-booking-user" author="Alexandr_Makutsevich">
+
+        <preConditions>
+            <tableExists tableName="booking"/>
+            <tableExists tableName="user"/>
+        </preConditions>
+
+        <addColumn tableName="booking">
+            <column name="user_id" type="uuid">
+                <constraints nullable="true" foreignKeyName="fk_booking_user"
+                             references="user(id)" deleteCascade="true"/>
+            </column>
+        </addColumn>
+
+    </changeSet>
+
+    <changeSet id="2024-09-05-add-foreign_key-booking-workplace" author="Ravil_Nurullin">
+
+        <preConditions>
+            <tableExists tableName="booking"/>
+            <tableExists tableName="workplace"/>
+        </preConditions>
+
+        <addColumn tableName="booking">
+            <column name="workplace_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_workplace_booking_into_booking_table"
+                             references="workplace(id)"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

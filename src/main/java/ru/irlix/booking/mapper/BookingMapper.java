@@ -26,6 +26,7 @@ public interface BookingMapper {
     @Mapping(target = "cancelReason", ignore = true)
     @Mapping(target = "workplace", ignore = true)
     @Mapping(target = "booked", ignore = true)
+    @Mapping(target = "user", ignore = true)
     Booking createRequestToEntity(BookingCreateRequest createRequest);
 
     @Mapping(target = "id", ignore = true)
@@ -35,6 +36,7 @@ public interface BookingMapper {
     @Mapping(target = "bookingEndDateTime", ignore = true)
     @Mapping(target = "workplace", ignore = true)
     @Mapping(target = "booked", ignore = true)
+    @Mapping(target = "user", ignore = true)
     Booking cancelRequestToEntity(BookingCancelRequest cancelRequest);
 
     List<BookingResponse> entityListToResponseList(List<Booking> bookings);

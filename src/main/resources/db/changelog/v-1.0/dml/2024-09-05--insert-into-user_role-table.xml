@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="2024-09-05--insert-into-user_role-table" author="Alexandr_Makutsevich">
+
+        <preConditions>
+            <tableExists tableName="user_role"/>
+            <tableExists tableName="user"/>
+            <tableExists tableName="role"/>
+        </preConditions>
+
+        <insert tableName="user_role">
+            <column name="user_id" value="12121212-1212-1212-1212-121212121212"/>
+            <column name="role_id" value="15151515-1515-1515-1515-151515151515"/>
+        </insert>
+
+        <insert tableName="user_role">
+            <column name="user_id" value="13131313-1313-1313-1313-131313131313"/>
+            <column name="role_id" value="15151515-1515-1515-1515-151515151515"/>
+        </insert>
+
+    </changeSet>
+
+</databaseChangeLog>

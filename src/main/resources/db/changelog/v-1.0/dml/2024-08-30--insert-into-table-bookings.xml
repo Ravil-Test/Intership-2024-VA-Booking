@@ -20,6 +20,7 @@
             <column name="booking_cancel_reason" value="Booking canceled by Administrator. Reason: 1"/>
             <column name="workplace_id" value="77777777-7777-7777-7777-777777777777"/>
             <column name="is_booked" valueBoolean="false"/>
+            <column name="user_id" value="12121212-1212-1212-1212-121212121212"/>
         </insert>
         <insert tableName="booking">
             <column name="id" value="00000000-0000-0000-1111-222222222222"/>
@@ -28,6 +29,7 @@
             <column name="booking_end_date_time" value="2024-08-31 20:00:00.000000"/>
             <column name="booking_cancel_date_time" value="2024-08-31 12:11:50.077721"/>
             <column name="booking_cancel_reason" value="Booking canceled by Administrator. Reason: 2"/>
+            <column name="user_id" value="12121212-1212-1212-1212-121212121212"/>
             <column name="workplace_id" value="88888888-8888-8888-8888-888888888888"/>
             <column name="is_booked" valueBoolean="false"/>
         </insert>
@@ -38,6 +40,7 @@
             <column name="booking_end_date_time" value="2024-08-31 20:00:00.000000"/>
             <column name="booking_cancel_date_time" value="2024-08-31 12:11:50.077721"/>
             <column name="booking_cancel_reason" value="Booking canceled by Administrator. Reason: 3"/>
+            <column name="user_id" value="12121212-1212-1212-1212-121212121212"/>
             <column name="workplace_id" value="99999999-9999-9999-9999-999999999999"/>
             <column name="is_booked" valueBoolean="false"/>
         </insert>

@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import ru.irlix.booking.dto.office.OfficeCreateRequest;
 import ru.irlix.booking.dto.office.OfficeResponse;
 import ru.irlix.booking.dto.office.OfficeSearchRequest;
@@ -25,6 +26,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName(value = "Тесты бизнес-логики офисов")
 @TestPropertySource("classpath:application-test.properties")
+@Sql({
+        "classpath:sql/init_data.sql"
+})
 class OfficeServiceImplTest extends BaseIntegrationTest {
 
     @Autowired
