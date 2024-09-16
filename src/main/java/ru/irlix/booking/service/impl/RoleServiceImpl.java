@@ -33,6 +33,11 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    public Role getRoleByName(String name) {
+        return roleRepository.findRoleByName(name);
+    }
+
+    @Override
     public List<RoleResponse> getAll() {
         return roleMapper
                 .entityListToResponseList(roleRepository.findAll());

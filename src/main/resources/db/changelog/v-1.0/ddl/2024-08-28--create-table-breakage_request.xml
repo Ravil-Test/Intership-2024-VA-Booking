@@ -29,19 +29,4 @@
 
     </changeSet>
 
-    <changeSet id="2024-09-05-add-foreign_key-breakage_request-workplace" author="Ravil_Nurullin">
-
-        <preConditions>
-            <tableExists tableName="breakage_request"/>
-            <tableExists tableName="workplace"/>
-        </preConditions>
-
-        <addColumn tableName="breakage_request">
-            <column name="workplace_id" type="uuid">
-                <constraints nullable="false" foreignKeyName="fk_workplace_breakage_request_into_breakage_request_table"
-                             references="workplace(id)"/>
-            </column>
-        </addColumn>
-    </changeSet>
-
 </databaseChangeLog>

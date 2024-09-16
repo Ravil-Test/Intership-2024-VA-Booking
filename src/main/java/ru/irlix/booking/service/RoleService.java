@@ -5,6 +5,7 @@ import org.springframework.lang.NonNull;
 import ru.irlix.booking.dto.role.RoleCreateRequest;
 import ru.irlix.booking.dto.role.RoleResponse;
 import ru.irlix.booking.dto.role.RoleUpdateRequest;
+import ru.irlix.booking.entity.Role;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +22,14 @@ public interface RoleService {
      * @return - найденная роль
      */
     RoleResponse getById(@NotNull UUID id);
+
+    /**
+     * Получить роль по названию
+     *
+     * @param name - название роли
+     * @return - найденная роль
+     */
+    Role getRoleByName(String name);
 
     /**
      * Получить список ролей

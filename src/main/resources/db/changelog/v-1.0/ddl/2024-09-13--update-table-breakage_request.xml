@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="2024-09-04-add-foreignkey-breakageRequest-user" author="Alexandr_Makutsevich">
+
+        <preConditions>
+            <tableExists tableName="breakage_request"/>
+            <tableExists tableName="user"/>
+        </preConditions>
+
+        <addColumn tableName="breakage_request">
+            <column name="user_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_breakageRequest_user"
+                             references="user(id)" deleteCascade="true"/>
+            </column>
+        </addColumn>
+
+    </changeSet>
+
+    <changeSet id="2024-09-05-add-foreign_key-breakage_request-workplace" author="Ravil_Nurullin">
+
+        <preConditions>
+            <tableExists tableName="breakage_request"/>
+            <tableExists tableName="workplace"/>
+        </preConditions>
+
+        <addColumn tableName="breakage_request">
+            <column name="workplace_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_workplace_breakage_request_into_breakage_request_table"
+                             references="workplace(id)"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

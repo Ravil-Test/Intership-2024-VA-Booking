@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import ru.irlix.booking.dto.room.RoomCreateRequest;
 import ru.irlix.booking.dto.room.RoomResponse;
 import ru.irlix.booking.dto.room.RoomSearchRequest;
@@ -30,8 +31,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName(value = "Тесты безнес-логики офисов")
+@DisplayName(value = "Тесты безнес-логики помещений")
 @TestPropertySource("classpath:application-test.properties")
+@Sql({
+        "classpath:sql/init_data.sql"
+})
 class RoomServiceImplTest extends BaseIntegrationTest {
 
     @Autowired
@@ -50,7 +54,7 @@ class RoomServiceImplTest extends BaseIntegrationTest {
         RoomResponse actualResponse = roomService.getById(id);
 
         assertNotNull(actualResponse);
-        assertEquals("Малый переговорный зал", actualResponse.name());
+        assertEquals("Small meeting room", actualResponse.name());
         assertEquals((short) 3, actualResponse.floorNumber());
         assertEquals((short) 15, actualResponse.roomNumber());
         assertFalse(actualResponse.isDelete());
@@ -71,8 +75,8 @@ class RoomServiceImplTest extends BaseIntegrationTest {
     @DisplayName(value = "Тест на получение списка помещений")
     void getAllTest_success() {
         List<RoomResponse> expectedResponseList = List.of(
-                new RoomResponse("Малый переговорный зал", (short) 3, (short) 15, false),
-                new RoomResponse("Большой конференц-зал", (short) 2, (short) 10, false));
+                new RoomResponse("Small meeting room", (short) 3, (short) 15, false),
+                new RoomResponse("Large conference room", (short) 2, (short) 10, false));
         List<RoomResponse> actualResponseList = roomService.getAll();
 
         assertEquals(expectedResponseList.size(), actualResponseList.size());
@@ -86,15 +90,15 @@ class RoomServiceImplTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение страницы со списком помещений")
     void getRoomWithFilterTest_success() {
-        RoomResponse expectedResponse = new RoomResponse("Малый переговорный зал", (short) 3, (short) 15, false);
-        RoomSearchRequest searchRequest = new RoomSearchRequest("Малый переговорный зал", false, (short) 3, (short) 15, null);
+        RoomResponse expectedResponse = new RoomResponse("Small meeting room", (short) 3, (short) 15, false);
+        RoomSearchRequest searchRequest = new RoomSearchRequest("Small meeting room", false, (short) 3, (short) 15, null);
         Pageable pageable = PageRequest.of(0, 10);
 
         Page<RoomResponse> roomPage = roomService.getRoomsWithFilters(searchRequest, pageable);
         List<RoomResponse> actualResponse = roomPage.getContent();
 
         assertNotNull(actualResponse);
-        assertEquals("Малый переговорный зал", actualResponse.get(0).name());
+        assertEquals("Small meeting room", actualResponse.get(0).name());
         assertTrue(actualResponse.stream().anyMatch(actual -> actual.equals(expectedResponse)));
     }
 
@@ -104,15 +108,14 @@ class RoomServiceImplTest extends BaseIntegrationTest {
     @DisplayName(value = "Тест на получение страницы со списком помещений без фильтров")
     void getRoomWithoutFilterTest_success() {
         List<RoomResponse> expectedResponseList = List.of(
-                new RoomResponse("Малый переговорный зал", (short) 3, (short) 15, false),
-                new RoomResponse("Большой конференц-зал", (short) 2, (short) 10, false));
+                new RoomResponse("Small meeting room", (short) 3, (short) 15, false),
+                new RoomResponse("Large conference room", (short) 2, (short) 10, false));
 
         RoomSearchRequest filter = new RoomSearchRequest(null, null, null, null, null);
         Pageable pageable = PageRequest.of(0, 10);
 
         Page<RoomResponse> roomPage = roomService.getRoomsWithFilters(filter, pageable);
         List<RoomResponse> actualContent = roomPage.getContent();
-
         assertNotNull(actualContent);
         assertFalse(actualContent.isEmpty());
         assertTrue(actualContent.stream().anyMatch(actualResponse -> actualResponse.equals(expectedResponseList.get(0))));

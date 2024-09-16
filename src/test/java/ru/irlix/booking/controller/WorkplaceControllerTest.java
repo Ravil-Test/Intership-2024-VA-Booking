@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.irlix.booking.dto.workplace.WorkplaceCreateRequest;
@@ -28,6 +29,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DisplayName(value = "Тесты контроллера рабочих мест")
 @TestPropertySource("classpath:application-test.properties")
+@Sql({
+        "classpath:sql/init_data.sql"
+})
 class WorkplaceControllerTest extends BaseIntegrationTest {
 
     @Test

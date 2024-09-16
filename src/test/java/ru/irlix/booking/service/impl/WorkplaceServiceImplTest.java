@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import ru.irlix.booking.dto.workplace.WorkplaceCreateRequest;
 import ru.irlix.booking.dto.workplace.WorkplaceResponse;
 import ru.irlix.booking.dto.workplace.WorkplaceSearchRequest;
@@ -27,6 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName(value = "Тесты бизнес-логики рабочих мест")
 @TestPropertySource("classpath:application-test.properties")
+@Sql({
+        "classpath:sql/init_data.sql"
+})
 class WorkplaceServiceImplTest extends BaseIntegrationTest {
 
     @Autowired

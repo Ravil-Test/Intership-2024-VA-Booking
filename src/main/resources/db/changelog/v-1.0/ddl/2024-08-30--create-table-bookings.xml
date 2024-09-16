@@ -37,19 +37,4 @@
 
     </changeSet>
 
-    <changeSet id="2024-09-05-add-foreign_key-booking-workplace" author="Ravil_Nurullin">
-
-        <preConditions>
-            <tableExists tableName="booking"/>
-            <tableExists tableName="workplace"/>
-        </preConditions>
-
-        <addColumn tableName="booking">
-            <column name="workplace_id" type="uuid">
-                <constraints nullable="false" foreignKeyName="fk_workplace_booking_into_booking_table"
-                             references="workplace(id)"/>
-            </column>
-        </addColumn>
-    </changeSet>
-
-</databaseChangeLog>
+   </databaseChangeLog>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="2024-09-05--create-user_role-table" author="Alexandr_Makutsevich">
+
+        <preConditions>
+            <not>
+                <tableExists tableName="user_role"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="user_role">
+            <column name="user_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_user_role_user"
+                             references="user(id)" deleteCascade="true"/>
+            </column>
+            <column name="role_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_role_user_role"
+                             references="role(id)" deleteCascade="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

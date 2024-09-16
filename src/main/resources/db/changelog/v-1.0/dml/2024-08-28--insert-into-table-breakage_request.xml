@@ -18,6 +18,7 @@
             <column name="workplace_id" value="77777777-7777-7777-7777-777777777777"/>
             <column name="is_completed" value="false"/>
             <column name="is_canceled" value="false"/>
+            <column name="user_id" value="12121212-1212-1212-1212-121212121212"/>
         </insert>
 
         <insert tableName="breakage_request">
@@ -27,6 +28,7 @@
             <column name="workplace_id" value="99999999-9999-9999-9999-999999999999"/>
             <column name="is_completed" value="false"/>
             <column name="is_canceled" value="false"/>
+            <column name="user_id" value="12121212-1212-1212-1212-121212121212"/>
         </insert>
 
     </changeSet>
