@@ -1,11 +1,15 @@
 package ru.irlix.booking.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,10 +19,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.irlix.booking.dto.user.UserCreateRequest;
 import ru.irlix.booking.dto.user.UserResponse;
+import ru.irlix.booking.dto.user.UserSearchRequest;
 import ru.irlix.booking.dto.user.UserUpdateRequest;
 import ru.irlix.booking.service.UserService;
 
@@ -57,12 +63,28 @@ public class UserController {
         return userService.getById(id);
     }
 
+    @GetMapping("/search")
+    @Operation(summary = "Поиск пользователей",
+            description = "Возвращает статус 200 и список пользователей с фильтрацией по fio или статусу is_deleted")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Запрос прошел успешно"),
+            @ApiResponse(responseCode = "403", description = "Недостаточно прав")
+    })
+    public Page<UserResponse> search(@RequestBody(required = false) @Parameter(description = "Фильтр пользователей")
+                                     @Valid UserSearchRequest searchRequest,
+                                     @RequestParam(name = "page", defaultValue = "0") @Min(value = 0,
+                                             message = "Страница не может быть отрицательным числом") int page,
+                                     @RequestParam(name = "size", defaultValue = "10") @Min(value = 1,
+                                             message = "Число отображаемых объектов не может быть меньше 1") int size) {
+        return userService.search(PageRequest.of(page, size), searchRequest);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Создать пользователя",
-            description = "Возвращает статус 200 и созданного пользователя")
+            description = "Возвращает статус 201 и созданного пользователя")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Пользователь создан"),
+            @ApiResponse(responseCode = "201", description = "Пользователь создан"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
@@ -76,7 +98,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Пользователь обновлён"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные"),
-            @ApiResponse(responseCode = "404", description = "Помещение не найдено"),
+            @ApiResponse(responseCode = "404", description = "Пользователь не найден"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
     public UserResponse update(@PathVariable UUID id,
