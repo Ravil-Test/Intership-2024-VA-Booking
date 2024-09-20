@@ -1,32 +1,31 @@
 package ru.irlix.booking.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.irlix.booking.dto.user.UserCreateRequest;
 import ru.irlix.booking.util.BaseIntegrationTest;
 
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+
 @DisplayName(value = "Тесты контроллера пользователей")
+@TestPropertySource("classpath:application-test.properties")
+@Sql({
+        "classpath:sql/init_usersServiceImplTest.sql"
+})
 class UserControllerTest extends BaseIntegrationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Test
     @DirtiesContext
@@ -44,15 +43,97 @@ class UserControllerTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на получение пользователя по id")
     void getById() throws Exception {
-        UUID id = UUID.fromString("13131313-1313-1313-1313-131313131313");
+        UUID id = UUID.fromString("32323232-3232-3232-3232-323232323232");
 
         mockMvc.perform(get("/users/{id}", id))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fio").value("Петров Пётр Петрович"))
-                .andExpect(jsonPath("$.phoneNumber").value("88002008888"))
-                .andExpect(jsonPath("$.email").value("petrov.dev@gmail.com"))
+                .andExpect(jsonPath("$.fio").value("Ignatiev Ignat Ignatievich"))
+                .andExpect(jsonPath("$.phoneNumber").value("88003000400"))
+                .andExpect(jsonPath("$.email").value("ignat@yandex.ru"))
                 .andExpect(jsonPath("$.roles[0].name").value("USER"));
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Позитивный")
+    @DisplayName(value = "Позитивный тест с корректными параметрами, проверяющий пагинацию")
+    void getAllPagination_success() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/search")
+                        .param("page", "0")
+                        .param("size", "3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(3)))
+                .andExpect(jsonPath("$.totalPages").exists())
+                .andExpect(jsonPath("$.totalElements").exists());
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Негативный")
+    @DisplayName(value = "Негативный тест с некорректными параметрами, проверяющий пагинацию")
+    void getAllPagination_notFound() throws Exception {
+        mockMvc.perform(get("/users/search")
+                        .param("page", "-1")
+                        .param("size", "0"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Позитивный")
+    @DisplayName("Позитивный тест поиска и сортировки пользователей по инициалам и is_delete")
+    void searchFioUnique_success() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"fio\": \"Ivan\", \"isDelete\": false}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(1))
+                .andExpect(jsonPath("$.content.[0].fio").value("Sidorov Ivan Ivanovich"));
+
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Позитивный")
+    @DisplayName("Позитивный тест поиска и сортировки пользователей по инициалам")
+    void searchFioList_success() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"fio\": \"Ignat\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(2))
+                .andExpect(jsonPath("$.content.[0].fio").value("Ignatiev Ignat Ignatievich"))
+                .andExpect(jsonPath("$.content.[1].fio").value("Petrov Ignat Petrovich"))
+                .andExpect(jsonPath("$.content.[0].isDelete").value(false))
+                .andExpect(jsonPath("$.content.[1].isDelete").value(true));
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Негативный")
+    @DisplayName("Негативный тест пользователь не найден")
+    void search_notFound() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"fio\": \"NoNameUser\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(0));
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Позитивный")
+    @DisplayName("Позитивный тест поиска пользователей по статусу is_delete")
+    void searchIsDelete_success() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"isDelete\": false}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(2))
+                .andExpect(jsonPath("$.content[0].fio").value("Sidorov Ivan Ivanovich"))
+                .andExpect(jsonPath("$.content[1].fio").value("Ignatiev Ignat Ignatievich"));
+
     }
 
     @Test
@@ -68,7 +149,7 @@ class UserControllerTest extends BaseIntegrationTest {
                 "password1".toCharArray()
         );
 
-        String jsonRequest = objectMapper.writeValueAsString(userCreateRequest);
+        String jsonRequest = getMapper().writeValueAsString(userCreateRequest);
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -87,7 +168,7 @@ class UserControllerTest extends BaseIntegrationTest {
     @DisplayName(value = "Позитивный тест на обновление пользователя")
     void update() throws Exception {
 
-        UUID id = UUID.fromString("12121212-1212-1212-1212-121212121212");
+        UUID id = UUID.fromString("21212121-2121-2121-2121-212121212121");
 
         UserCreateRequest userCreateRequest = new UserCreateRequest(
                 "Васильев Василий Васильевич",
@@ -96,7 +177,7 @@ class UserControllerTest extends BaseIntegrationTest {
                 "password1112".toCharArray()
         );
 
-        String jsonRequest = objectMapper.writeValueAsString(userCreateRequest);
+        String jsonRequest = getMapper().writeValueAsString(userCreateRequest);
 
         mockMvc.perform(patch("/users/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -114,7 +195,7 @@ class UserControllerTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на удаление пользователя")
     void delete() throws Exception {
-        UUID id = UUID.fromString("13131313-1313-1313-1313-131313131313");
+        UUID id = UUID.fromString("21212121-2121-2121-2121-212121212121");
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON))

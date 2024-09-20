@@ -1,9 +1,12 @@
 package ru.irlix.booking.service;
 
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import ru.irlix.booking.dto.user.UserCreateRequest;
 import ru.irlix.booking.dto.user.UserResponse;
+import ru.irlix.booking.dto.user.UserSearchRequest;
 import ru.irlix.booking.dto.user.UserUpdateRequest;
 
 import java.util.List;
@@ -28,6 +31,15 @@ public interface UserService {
      * @return - список пользователей
      */
     List<UserResponse> getAll();
+
+    /**
+     * Фильтр для поиска пользователей
+     *
+     * @param pageable - пагинация
+     * @param useRequest - ДТО пользователя для поиска
+     * @return - список пользователей
+     */
+    Page<UserResponse> search(Pageable pageable, UserSearchRequest useRequest);
 
     /**
      * Создать пользователя

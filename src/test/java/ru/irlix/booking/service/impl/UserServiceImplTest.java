@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
+import ru.irlix.booking.dto.role.RoleResponse;
 import ru.irlix.booking.dto.user.UserCreateRequest;
 import ru.irlix.booking.dto.user.UserResponse;
 import ru.irlix.booking.dto.user.UserUpdateRequest;
@@ -72,14 +73,15 @@ class UserServiceImplTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на получение списка пользователей")
     void getAll_success() {
-        UUID id = UUID.fromString("15151515-1515-1515-1515-151515151515");
-        Role roleUser = new Role(id, "USER");
+        RoleResponse roleUser = new RoleResponse("USER");
 
         List<UserResponse> expectedResponseList = List.of(
                 new UserResponse("Sidorov Ivan Ivanovich", "88002000600",
                         "sidorov.dev@gmail.com", 120, false, Set.of(roleUser)),
                 new UserResponse("Ignatiev Ignat Ignatievich", "88003000400",
-                        "ignat@yandex.ru", 30, false, Set.of(roleUser)));
+                        "ignat@yandex.ru", 30, false, Set.of(roleUser)),
+                 new UserResponse("Petrov Ignat Petrovich", "82003000700",
+                         "petrov.dev@gmail.com", 20, true, Set.of(roleUser)));
 
         List<UserResponse> actualResponseList = userService.getAll();
 
@@ -87,6 +89,7 @@ class UserServiceImplTest extends BaseIntegrationTest {
         assertFalse(actualResponseList.isEmpty());
         assertTrue(actualResponseList.stream().anyMatch(actualResponse -> actualResponse.equals(expectedResponseList.get(0))));
         assertTrue(actualResponseList.stream().anyMatch(actualResponse -> actualResponse.equals(expectedResponseList.get(1))));
+        assertTrue(actualResponseList.stream().anyMatch(actualResponse -> actualResponse.equals(expectedResponseList.get(2))));
     }
 
     @Test

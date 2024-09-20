@@ -2,12 +2,12 @@ package ru.irlix.booking.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import ru.irlix.booking.entity.Role;
+import ru.irlix.booking.dto.role.RoleResponse;
 
 import java.util.Set;
 
 /**
- * Запрос на создание ользователя
+ * Запрос на получение пользователя
  * DTO for {@link ru.irlix.booking.entity.User}
  */
 public record UserResponse(
@@ -34,11 +34,11 @@ public record UserResponse(
         @JsonProperty(value = "isDelete")
         @Schema(title = "Статус пользователя (удален/не удален)",
                 example = "false")
-        boolean isDelete,
+        Boolean isDelete,
 
         @JsonProperty(value = "roles")
         @Schema(title = "Роль пользователя",
                 example = "USER")
-        Set<Role> roles
+        Set<RoleResponse> roles
 ) {
 }
