@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +40,7 @@ public class WorkplaceController {
     private final WorkplaceService workplaceService;
 
     @GetMapping
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Получить список рабочих мест",
             description = "Возвращает статус 200 и список рабочих мест")
     @ApiResponses(value = {
@@ -50,6 +52,7 @@ public class WorkplaceController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Получить список рабочих мест",
             description = "Возвращает статус 200 и список рабочих мест")
     @ApiResponses(value = {
@@ -58,11 +61,12 @@ public class WorkplaceController {
             @ApiResponse(responseCode = "404", description = "Записей с таким фильтром не найдено")
     })
     public Page<WorkplaceResponse> search(@RequestBody(required = false) @Parameter(description = "Фильтр записей")
-                                             @Valid WorkplaceSearchRequest searchRequest, Pageable pageable) {
+                                          @Valid WorkplaceSearchRequest searchRequest, Pageable pageable) {
         return workplaceService.search(searchRequest, pageable);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Получить рабочее место по id",
             description = "Возвращает статус 200 и найденное рабочее место")
     @ApiResponses(value = {
@@ -76,6 +80,7 @@ public class WorkplaceController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Создать рабочее место",
             description = "Возвращает статус 201 и созданное рабочее место")
     @ApiResponses(value = {
@@ -88,6 +93,7 @@ public class WorkplaceController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Обновить рабочее место",
             description = "Возвращает статус 200 и обновленное рабочее место")
     @ApiResponses(value = {
@@ -101,6 +107,7 @@ public class WorkplaceController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Удалить рабочее место",
             description = "Возвращает статус 200")
     @ApiResponses(value = {

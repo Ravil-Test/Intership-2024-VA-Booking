@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +36,7 @@ public class RoleController {
     private final RoleService roleService;
 
     @GetMapping
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Получить список ролей",
             description = "Возвращает статус 200 и список ролей")
     @ApiResponses(value = {
@@ -46,6 +48,7 @@ public class RoleController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Получить роль по id",
             description = "Возвращает статус 200 и найденную роль")
     @ApiResponses(value = {
@@ -59,10 +62,11 @@ public class RoleController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Создать роль",
-            description = "Возвращает статус 200 и созданную роль")
+            description = "Возвращает статус 201 и созданную роль")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Роль создана"),
+            @ApiResponse(responseCode = "201", description = "Роль создана"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
@@ -71,6 +75,7 @@ public class RoleController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Обновление роли",
             description = "Возвращает статус 200 и обновленную роль")
     @ApiResponses(value = {
@@ -85,6 +90,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Удалить роль",
             description = "Возвращает статус 200")
     @ApiResponses(value = {

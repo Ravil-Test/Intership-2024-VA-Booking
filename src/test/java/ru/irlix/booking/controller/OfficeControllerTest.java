@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MvcResult;
 import ru.irlix.booking.dto.office.OfficeCreateRequest;
@@ -28,16 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class OfficeControllerTest extends BaseIntegrationTest {
 
     @Test
-    @DirtiesContext
-    @Tag(value = "Позитивный")
-    @DisplayName(value = "Тест на получение списка офисов")
-    void getAllTest_success() throws Exception {
-        mockMvc.perform(get("/offices"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
-    }
-
-    @Test
+    @WithMockUser
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение страницы со списком офисов")
@@ -62,6 +54,18 @@ class OfficeControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser
+    @DirtiesContext
+    @Tag(value = "Позитивный")
+    @DisplayName(value = "Тест на получение списка офисов")
+    void getAllTest_success() throws Exception {
+        mockMvc.perform(get("/offices"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    @WithMockUser
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение офиса на id")
@@ -79,6 +83,7 @@ class OfficeControllerTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на создание офиса")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void createOfficeTest_success() throws Exception {
         OfficeCreateRequest createRequest = new OfficeCreateRequest("Test address", "Test name");
         String jsonCreateRequest = getMapper().writeValueAsString(createRequest);
@@ -96,6 +101,7 @@ class OfficeControllerTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на обновление офиса")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void updateOfficeTest_success() throws Exception {
         UUID id = UUID.fromString("33333333-3333-3333-3333-333333333333");
 
@@ -115,6 +121,7 @@ class OfficeControllerTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Негативный")
     @DisplayName(value = "Тест на обновление офиса")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void updateOfficeTest_notFound() throws Exception {
         UUID id = UUID.randomUUID();
         String updateRequest = getMapper().writeValueAsString(new OfficeUpdateRequest("Update test address", "Update test name"));
@@ -129,6 +136,7 @@ class OfficeControllerTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на удаление офиса")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void deleteOfficeTest_success() throws Exception {
         UUID id = UUID.fromString("22222222-2222-2222-2222-222222222222");
 

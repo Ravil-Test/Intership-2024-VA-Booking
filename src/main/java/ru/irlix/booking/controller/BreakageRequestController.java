@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +34,7 @@ public class BreakageRequestController {
     private final BreakageRequestService breakageRequestService;
 
     @GetMapping
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Получить список заявок о поломках",
             description = "Возвращает статус 200 и список заявок о поломках")
     public List<BreakageResponse> getAll() {
@@ -40,6 +42,7 @@ public class BreakageRequestController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Получить заявку о поломке по id",
             description = "Возвращает статус 200 и заявку о поломке")
     public BreakageResponse getById(@PathVariable UUID id) {
@@ -48,6 +51,7 @@ public class BreakageRequestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Создать заявку о поломке",
             description = "Возвращает статус 201 и созданную заявку о поломке")
     public BreakageResponse createBreakageRequest(@RequestBody @Valid BreakageRequestCreate createRequest) {
@@ -55,6 +59,7 @@ public class BreakageRequestController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Обновить заявку о поломке",
             description = "Возвращает статус 200 и обновленную заявку о поломке")
     public BreakageResponse updateBreakageRequest(@PathVariable UUID id,
@@ -63,6 +68,7 @@ public class BreakageRequestController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Удалить заявку о поломке",
             description = "Возвращает статус 200 ")
     public void deleteBreakageRequest(@PathVariable UUID id) {

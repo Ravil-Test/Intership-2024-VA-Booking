@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -25,11 +26,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Sql({
         "classpath:sql/init_data.sql"
 })
-public class BookingControllerTest extends BaseIntegrationTest {
+class BookingControllerTest extends BaseIntegrationTest {
 
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
+    @WithMockUser(authorities = "ROLE_USER")
     @DisplayName(value = "Тест на получение списка бронирований")
     void getAllTest_success() throws Exception {
         mockMvc.perform(get("/bookings"))
@@ -40,6 +42,7 @@ public class BookingControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
+    @WithMockUser(authorities = "ROLE_USER")
     @DisplayName(value = "Тест на получение бронирования по id")
     void getBookingByIdTest_success() throws Exception {
         UUID id = UUID.fromString("00000000-0000-0000-0000-000000000001");
@@ -58,6 +61,7 @@ public class BookingControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Негативный")
+    @WithMockUser(authorities = "ROLE_USER")
     @DisplayName(value = "Тест на получение бронирования по id")
     void getBookingByIdTest_failure() throws Exception {
         UUID id = UUID.fromString("00000000-0000-0000-0000-000000001212");
@@ -69,6 +73,7 @@ public class BookingControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DisplayName(value = "Тест на создание бронирования")
     void createBookingTest_success() throws Exception {
         UUID userId = UUID.fromString("21212121-2121-2121-2121-212121212121");
@@ -97,6 +102,7 @@ public class BookingControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DisplayName(value = "Тест на отмену бронирования")
     void cancelBookingTest_success() throws Exception {
         UUID id = UUID.fromString("00000000-0000-0000-0000-000000000001");
@@ -110,6 +116,7 @@ public class BookingControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Негативный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DisplayName(value = "Тест на отмену бронирования")
     void cancelBookingTest_failure() throws Exception {
         UUID id = UUID.fromString("00000000-0000-0000-0000-000000000002");
@@ -123,6 +130,7 @@ public class BookingControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DisplayName(value = "Тест на подтверждение бронирования")
     void confirmBookingTest_success() throws Exception {
         UUID id = UUID.fromString("00000000-0000-0000-0000-000000000001");
@@ -138,6 +146,7 @@ public class BookingControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Негативный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DisplayName(value = "Тест на подтверждение бронирования")
     void confirmBookingTest_failure() throws Exception {
         UUID id = UUID.fromString("00000000-0000-0000-0000-000000000045");

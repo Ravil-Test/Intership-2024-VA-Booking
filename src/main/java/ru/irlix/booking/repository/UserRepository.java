@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.irlix.booking.entity.User;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -25,4 +26,16 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
     @Modifying
     @Query("update User u set u.isDelete = :delete where u.id = :id")
     void changeUserIsDeleted(@Param("id") UUID id, @Param("delete") boolean delete);
+
+    /**
+     * @param phoneNumber
+     * @return
+     */
+    Optional<User> getUserByPhoneNumber(String phoneNumber);
+
+    /**
+     * @param email
+     * @return
+     */
+    Optional<User> getUserByEmail(String email);
 }

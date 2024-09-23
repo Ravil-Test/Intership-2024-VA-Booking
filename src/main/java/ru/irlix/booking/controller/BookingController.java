@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,6 +40,7 @@ public class BookingController {
     private final BookingService bookingService;
 
     @GetMapping
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Получить список бронирования",
             description = "Возвращает статус 200 и список бронирования")
     @ApiResponses(value = {
@@ -63,6 +65,7 @@ public class BookingController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Получить бронирование по id",
             description = "Возвращает статус 200 и найденное бронирование")
     @ApiResponses(value = {
@@ -76,6 +79,7 @@ public class BookingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Создать бронирование",
             description = "Возвращает статус 201 и созданное бронирование")
     @ApiResponses(value = {
@@ -88,6 +92,7 @@ public class BookingController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Обновить бронирование",
             description = "Возвращает статус 200 и обновленное бронирование")
     @ApiResponses(value = {
@@ -102,6 +107,7 @@ public class BookingController {
     }
 
     @PatchMapping("/confirmation/{id}")
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Подтвердить бронирование",
             description = "Возвращает статус 200")
     @ApiResponses(value = {

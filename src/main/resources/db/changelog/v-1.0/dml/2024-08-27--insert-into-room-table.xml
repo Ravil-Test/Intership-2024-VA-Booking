@@ -30,7 +30,7 @@
             <column name="room_number" value="4"/>
             <column name="office_id" value="33333333-3333-3333-3333-333333333333"/>
         </insert>
-        
+
     </changeSet>
 
 </databaseChangeLog>

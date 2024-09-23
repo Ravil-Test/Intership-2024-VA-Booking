@@ -20,7 +20,6 @@ import ru.irlix.booking.service.BookingService;
 import ru.irlix.booking.service.UserService;
 import ru.irlix.booking.service.WorkplaceService;
 import ru.irlix.booking.specification.BookingSpecifications;
-import ru.irlix.booking.specification.RoomSpecification;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponse save(@NonNull BookingCreateRequest createRequest) {
         Booking booking = bookingMapper.createRequestToEntity(createRequest);
 
-        booking.setUser(userService.getUserWithNullCheck(createRequest.userID()));
+        booking.setUser(userService.getUserById(createRequest.userID()));
         booking.setWorkplace(workplaceService.optionalCheck(createRequest.workplaceID()));
 
         Booking savedBooking = bookingRepository.save(booking);

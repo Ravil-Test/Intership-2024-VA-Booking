@@ -24,7 +24,7 @@ public record UserCreateRequest(
         @JsonProperty(value = "phoneNumber")
         @NotBlank(message = "Номер телефона не должен быть пустым")
         @Schema(title = "Номер телефона пользователя",
-                example = "88002000600")
+                example = "+78002000600")
         @Pattern(regexp = "^\\+?[0-9\\-\\s]*$")
         @Size(min = 5, max = 12, message = "Минимальная длина телефона - 5 символа, максимальная - 12")
         String phoneNumber,
@@ -33,7 +33,7 @@ public record UserCreateRequest(
         @NotBlank(message = "Email не должен быть пустым")
         @Email(message = "Неверный формат email")
         @Schema(title = "Электронная почта пользователя",
-                example = "ivanov.dev@gmail.com")
+                example = "test.dev@gmail.com")
         String email,
 
         @JsonProperty(value = "password")
