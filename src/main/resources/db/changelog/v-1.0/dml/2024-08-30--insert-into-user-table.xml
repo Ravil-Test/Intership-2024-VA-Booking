@@ -5,7 +5,7 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
 
-    <changeSet id="2024-08-30--create-table-users" author="Alexandr_Makutsevich">
+    <changeSet id="2024-08-30--insert-into-table-users" author="Alexandr_Makutsevich">
 
         <preConditions>
             <tableExists tableName="user"/>
@@ -29,6 +29,22 @@
             <column name="available_minutes_for_booking" value="60"/>
         </insert>
 
+    </changeSet>
+
+    <changeSet id="2024-09-23--insert-admin-into-table-users" author="Kirill_Mamonov">
+
+        <preConditions>
+            <tableExists tableName="user"/>
+        </preConditions>
+
+        <insert tableName="user">
+            <column name="id" value="18181818-1818-1818-1818-181818181818"/>
+            <column name="fio" value="Admin Admin Admin"/>
+            <column name="phone_number" value="+78002000600"/>
+            <column name="email" value="test.dev@gmail.com"/>
+            <column name="password" value="$2b$12$.N1OxcbtHTnEnG.9KPZBSuMXg4NwpAon2F37Rt/VG16wdUoqNz8jG"/>
+            <column name="available_minutes_for_booking" value="120"/>
+        </insert>
 
     </changeSet>
 </databaseChangeLog>

@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.irlix.booking.dto.user.UserCreateRequest;
@@ -15,8 +18,10 @@ import ru.irlix.booking.dto.user.UserSearchRequest;
 import ru.irlix.booking.dto.user.UserUpdateRequest;
 import ru.irlix.booking.entity.Role;
 import ru.irlix.booking.entity.User;
+import ru.irlix.booking.exception.RegistrationFailedException;
 import ru.irlix.booking.mapper.UserMapper;
 import ru.irlix.booking.repository.UserRepository;
+import ru.irlix.booking.security.config.PasswordEncoder;
 import ru.irlix.booking.service.RoleService;
 import ru.irlix.booking.service.UserService;
 import ru.irlix.booking.specification.UserSpecification;
@@ -30,15 +35,17 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final static String DEFAULT_ROLE = "USER";
+
+    private static final String DEFAULT_ROLE = "USER";
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final RoleService roleService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public UserResponse getById(UUID id) {
-        User user = getUserWithNullCheck(id);
+        User user = getUserById(id);
         log.info("Получение пользователя по id: {} : {}", id, user);
         return userMapper.entityToResponse(user);
     }
@@ -71,15 +78,22 @@ public class UserServiceImpl implements UserService {
         return usersPage.map(userMapper::entityToResponse);
     }
 
+
     @Override
     @Transactional
     public UserResponse save(@NonNull UserCreateRequest createRequest) {
+        String actualPhoneNumber = createRequest.phoneNumber().replaceAll("\\D", "");
+
+        if (userRepository.getUserByPhoneNumber(actualPhoneNumber).isPresent() || userRepository.getUserByEmail(createRequest.email()).isPresent())
+            throw new RegistrationFailedException("Такой пользователь уже зарегистрирован");
+
         User createUser = userMapper.createRequestToEntity(createRequest);
 
         Role defaultRole = roleService.getRoleByName(DEFAULT_ROLE);
         createUser.setRoles(Set.of(defaultRole));
-
+        createUser.setPassword(passwordEncoder.passwordEncoder().encode(String.valueOf(createUser.getPassword())).toCharArray());
         User saveUser = userRepository.save(createUser);
+
         log.info("Создание пользователя {}", createUser);
         return userMapper.entityToResponse(saveUser);
     }
@@ -87,7 +101,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse update(UUID id, @NonNull UserUpdateRequest updateRequest) {
-        User currentUser = getUserWithNullCheck(id);
+        User currentUser = getUserById(id);
         User updateUser = userMapper.updateRequestToEntity(updateRequest);
 
         Optional.ofNullable(updateUser.getFio()).ifPresent(currentUser::setFio);
@@ -105,20 +119,54 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void delete(UUID id) {
         userRepository.changeUserIsDeleted(id, true);
-        log.info("Пользователь с id {} удалён", id);
+        log.info("Пользователь с id :{} удалён", id);
     }
 
-    /**
-     * Получить пользователя с проверкой на null
-     *
-     * @param id - id пользователя
-     * @return - найденный пользователь
-     */
-    public User getUserWithNullCheck(UUID id) {
-        return userRepository.findById(id)
-                .orElseThrow(
-                        () -> new EntityNotFoundException(("Пользователь с заданным id - "
-                                + id
-                                + " не найден")));
+    @Override
+    @Transactional
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user;
+
+        if (username.matches("^\\+?[0-9\\-\\s]*$")) {
+            user = getUserByPhoneNumber(username);
+
+            return new org.springframework.security.core.userdetails.User(
+                    user.getPhoneNumber(),
+                    String.valueOf(user.getPassword()),
+                    user.getRoles()
+                            .stream()
+                            .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName())).toList()
+            );
+        } else if (username.matches("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")) {
+            user = getUserByEmail(username);
+
+            return new org.springframework.security.core.userdetails.User(
+                    user.getEmail(),
+                    String.valueOf(user.getPassword()),
+                    user.getRoles()
+                            .stream()
+                            .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName())).toList()
+            );
+        } else
+            throw new IllegalArgumentException("Логин не соответствует номеру телефона или email адресу");
     }
+
+    @Override
+    public User getUserById(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(("User with id: " + id + " not found")));
+    }
+
+    @Override
+    public User getUserByPhoneNumber(String phoneNumber) {
+        return userRepository.getUserByPhoneNumber(phoneNumber).orElseThrow(()
+                -> new EntityNotFoundException("User with phone number: " + phoneNumber + " not found"));
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.getUserByEmail(email).orElseThrow(()
+                -> new EntityNotFoundException("User with email: " + email + " not found"));
+    }
+
 }

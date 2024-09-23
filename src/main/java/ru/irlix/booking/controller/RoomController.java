@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +40,7 @@ public class RoomController {
     private final RoomService roomService;
 
     @GetMapping
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Получить список помещений",
             description = "Возвращает статус 200 и список офисов")
     @ApiResponses(value = {
@@ -50,6 +52,7 @@ public class RoomController {
     }
 
     @PostMapping("/search")
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Получить страницу со списком помещений",
             description = "Возвращает статус 200 и страницу с помещениями")
     @ApiResponses(value = {
@@ -64,6 +67,7 @@ public class RoomController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Получить помещение по id",
             description = "Возвращает статус 200 и найденное помещение")
     @ApiResponses(value = {
@@ -77,6 +81,7 @@ public class RoomController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Создать помещение",
             description = "Возвращает статус 200 и созданное помещение")
     @ApiResponses(value = {
@@ -89,6 +94,7 @@ public class RoomController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Обновить помещение",
             description = "Возвращает статус 200 и обновленное помещение")
     @ApiResponses(value = {
@@ -103,6 +109,7 @@ public class RoomController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Удалить помещение",
             description = "Возвращает статус 200")
     @ApiResponses(value = {

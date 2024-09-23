@@ -22,7 +22,6 @@ public record RoomCreateRequest(
         @Size(min = 3, max = 25, message = "Минимальное название для помещения - 3 символа, максимальная - 25")
         String name,
 
-
         @JsonProperty(value = "floorNumber")
         @NotNull(message = "Не может быть null")
         @Schema(title = "Номер этажа", example = "3")

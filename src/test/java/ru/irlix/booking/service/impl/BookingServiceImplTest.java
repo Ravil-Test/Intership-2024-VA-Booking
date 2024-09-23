@@ -11,11 +11,7 @@ import org.springframework.test.context.jdbc.Sql;
 import ru.irlix.booking.dto.booking.BookingCancelRequest;
 import ru.irlix.booking.dto.booking.BookingCreateRequest;
 import ru.irlix.booking.dto.booking.BookingResponse;
-import ru.irlix.booking.dto.room.RoomCreateRequest;
-import ru.irlix.booking.dto.room.RoomResponse;
-import ru.irlix.booking.dto.room.RoomUpdateRequest;
 import ru.irlix.booking.entity.Booking;
-import ru.irlix.booking.entity.Room;
 import ru.irlix.booking.repository.BookingRepository;
 import ru.irlix.booking.service.BookingService;
 import ru.irlix.booking.util.BaseIntegrationTest;
@@ -36,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Sql({
         "classpath:sql/init_usersServiceImplTest.sql"
 })
-public class BookingServiceImplTest extends BaseIntegrationTest {
+class BookingServiceImplTest extends BaseIntegrationTest {
 
     @Autowired
     private BookingService bookingService;
@@ -80,7 +76,7 @@ public class BookingServiceImplTest extends BaseIntegrationTest {
         assertEquals(LocalDateTime.now().withSecond(0).withNano(0), currentResponse.bookingEndDateTime());
         assertEquals(LocalDateTime.now().withSecond(0).withNano(0), currentResponse.bookingCancelDateTime());
         assertEquals("", currentResponse.cancelReason());
-        assertEquals(false, currentResponse.isBooked());
+        assertFalse(currentResponse.isBooked());
     }
 
     @Test

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class WorkplaceControllerTest extends BaseIntegrationTest {
 
     @Test
+    @WithMockUser
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение списка рабочих мест")
@@ -45,6 +47,7 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение рабочего места по id")
@@ -58,6 +61,7 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение рабочего места по id")
@@ -87,6 +91,7 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на создание рабочего места")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void saveTest_success() throws Exception {
         UUID roomId = UUID.fromString("33333333-3333-3333-3333-333333333333");
         WorkplaceCreateRequest createRequest = new WorkplaceCreateRequest(5, "Create test description", roomId);
@@ -104,6 +109,7 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на обновление рабочего места")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void updateTest_success() throws Exception {
         UUID workplaceId = UUID.fromString("55555555-5555-5555-5555-555555555555");
         UUID roomId = UUID.fromString("44444444-4444-4444-4444-444444444444");
@@ -123,6 +129,7 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на удаление рабочего места")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void deleteTest_success() throws Exception {
         UUID id = UUID.fromString("55555555-5555-5555-5555-555555555555");
 
@@ -139,6 +146,7 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Негативный")
     @DisplayName(value = "Тест получение рабочего места по id")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void notFoundTest_notFound() throws Exception {
         mockMvc.perform(get("/workplaces/{id}", UUID.randomUUID()))
                 .andExpect(status().isNotFound());

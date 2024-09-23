@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class RoomControllerTest extends BaseIntegrationTest {
 
     @Test
+    @WithMockUser(authorities = "ROLE_USER")
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение списка помещений")
@@ -38,6 +40,7 @@ class RoomControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_USER")
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение страницы со списком помещений")
@@ -67,6 +70,7 @@ class RoomControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_USER")
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение страницы со списком помещений без фильтра")
@@ -96,6 +100,7 @@ class RoomControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_USER")
     @DirtiesContext
     @Tag(value = "Негативный")
     @DisplayName(value = "Тест на получение страницы со списком помещений")
@@ -110,6 +115,7 @@ class RoomControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_USER")
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение помещения по id")
@@ -128,6 +134,7 @@ class RoomControllerTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на создание помещения")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void createTest_success() throws Exception {
         UUID officeId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
@@ -148,6 +155,7 @@ class RoomControllerTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на обновление помещения")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void updateTest_success() throws Exception {
         UUID roomId = UUID.fromString("55555555-5555-5555-5555-555555555555");
         UUID officeId = UUID.fromString("22222222-2222-2222-2222-222222222222");
@@ -168,6 +176,7 @@ class RoomControllerTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на удаление помещения")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void deleteTest_success() throws Exception {
         UUID id = UUID.fromString("66666666-6666-6666-6666-666666666666");
 
@@ -183,6 +192,7 @@ class RoomControllerTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Негативный")
     @DisplayName(value = "Тест получение помещения по id")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void notFoundCheck_notFound() throws Exception {
         UUID id = UUID.randomUUID();
 

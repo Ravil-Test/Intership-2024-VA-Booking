@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import ru.irlix.booking.dto.user.UserCreateRequest;
 import ru.irlix.booking.dto.user.UserResponse;
 import ru.irlix.booking.dto.user.UserSearchRequest;
@@ -16,7 +17,7 @@ import java.util.UUID;
 /**
  * Сервисный слой пользователей
  */
-public interface UserService {
+public interface UserService extends UserDetailsService {
 
     /**
      * Получить пользователя по id
@@ -71,5 +72,21 @@ public interface UserService {
      * @param id - id пользователя
      * @return - найденный пользователь
      */
-    User getUserWithNullCheck(UUID id);
+    User getUserById(UUID id);
+
+    /**
+     * Получить пользователя по номеру телефона с проверкой на null
+     *
+     * @param phoneNumber - номер телефона
+     * @return - найденный пользователь
+     */
+    User getUserByPhoneNumber(String phoneNumber);
+
+    /**
+     * Получить пользователя по номеру email адресу с проверкой на null
+     *
+     * @param email - email адрес
+     * @return - найденный пользователь
+     */
+    User getUserByEmail(String email);
 }

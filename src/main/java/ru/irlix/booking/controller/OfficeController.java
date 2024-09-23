@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,6 +41,7 @@ public class OfficeController {
     private final OfficeService officeService;
 
     @GetMapping
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Получить список офисов",
             description = "Возвращает статус 200 и список офисов")
     @ApiResponses(value = {
@@ -51,6 +53,7 @@ public class OfficeController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Получить список офисов с пагинацией и сортировкой",
             description = "Возвращает статус 200 и список офисов")
     @ApiResponses(value = {
@@ -64,6 +67,7 @@ public class OfficeController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Получить офис по id",
             description = "Возвращает статус 200 и найденный офис")
     @ApiResponses(value = {
@@ -76,6 +80,7 @@ public class OfficeController {
     }
 
     @PostMapping
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Создать офис",
             description = "Возвращает статус 201 и созданный офис")
@@ -89,6 +94,7 @@ public class OfficeController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Обновить офис",
             description = "Возвращает статус 200 и обновленный офис")
     @ApiResponses(value = {
@@ -102,6 +108,7 @@ public class OfficeController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Удалить офис",
             description = "Возвращает статус 200")
     @ApiResponses(value = {

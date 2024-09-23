@@ -3,7 +3,9 @@ package ru.irlix.booking.controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -14,7 +16,9 @@ import ru.irlix.booking.util.BaseIntegrationTest;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerTest extends BaseIntegrationTest {
 
     @Test
+    @WithMockUser(authorities = "ROLE_USER")
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на получение списка пользователей")
@@ -39,6 +44,7 @@ class UserControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_USER")
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на получение пользователя по id")
@@ -55,13 +61,16 @@ class UserControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_USER")
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест с корректными параметрами, проверяющий пагинацию")
     void getAllPagination_success() throws Exception {
+        String pageRequest = getMapper().writeValueAsString(PageRequest.of(0, 10));
+
         mockMvc.perform(MockMvcRequestBuilders.get("/users/search")
-                        .param("page", "0")
-                        .param("size", "3"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(pageRequest))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(3)))
                 .andExpect(jsonPath("$.totalPages").exists())
@@ -69,6 +78,7 @@ class UserControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_USER")
     @DirtiesContext
     @Tag(value = "Негативный")
     @DisplayName(value = "Негативный тест с некорректными параметрами, проверяющий пагинацию")
@@ -80,6 +90,7 @@ class UserControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_USER")
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName("Позитивный тест поиска и сортировки пользователей по инициалам и is_delete")
@@ -94,6 +105,7 @@ class UserControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_USER")
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName("Позитивный тест поиска и сортировки пользователей по инициалам")
@@ -110,6 +122,7 @@ class UserControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_USER")
     @DirtiesContext
     @Tag(value = "Негативный")
     @DisplayName("Негативный тест пользователь не найден")
@@ -122,6 +135,7 @@ class UserControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_USER")
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName("Позитивный тест поиска пользователей по статусу is_delete")
@@ -131,12 +145,12 @@ class UserControllerTest extends BaseIntegrationTest {
                         .content("{\"isDelete\": false}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.size()").value(2))
-                .andExpect(jsonPath("$.content[0].fio").value("Sidorov Ivan Ivanovich"))
-                .andExpect(jsonPath("$.content[1].fio").value("Ignatiev Ignat Ignatievich"));
-
+                .andExpect(jsonPath("$.content[0].fio").value("Ignatiev Ignat Ignatievich"))
+                .andExpect(jsonPath("$.content[1].fio").value("Sidorov Ivan Ivanovich"));
     }
 
     @Test
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на создание пользователя")
@@ -163,6 +177,7 @@ class UserControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на обновление пользователя")
@@ -191,6 +206,7 @@ class UserControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на удаление пользователя")
