@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
      * @param id - id пользователя
      * @return - найденный пользователь
      */
-    private User getUserWithNullCheck(UUID id) {
+    public User getUserWithNullCheck(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(
                         () -> new EntityNotFoundException(("Пользователь с заданным id - "

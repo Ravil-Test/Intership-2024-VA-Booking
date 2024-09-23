@@ -1,6 +1,7 @@
 package ru.irlix.booking.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,7 +11,7 @@ import ru.irlix.booking.entity.Booking;
 import java.util.UUID;
 
 @Repository
-public interface BookingRepository extends JpaRepository<Booking, UUID> {
+public interface BookingRepository extends JpaRepository<Booking, UUID>, JpaSpecificationExecutor<Booking> {
 
     /**
      * Изменить статус бронирования на подтвержден/не подтвержден

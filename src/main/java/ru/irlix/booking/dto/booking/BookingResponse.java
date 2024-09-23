@@ -32,7 +32,7 @@ public record BookingResponse(
         @Size(min = 2, max = 255, message = "Минимальный текст причины отмены - 2 символа, максимальная - 255")
         String cancelReason,
 
-        @JsonProperty(value = "is_booked")
+        @JsonProperty(value = "isBooked")
         @Schema(title = "Статус бронирования", example = "false")
         boolean isBooked) {
 }

@@ -8,6 +8,7 @@ import ru.irlix.booking.dto.workplace.WorkplaceCreateRequest;
 import ru.irlix.booking.dto.workplace.WorkplaceResponse;
 import ru.irlix.booking.dto.workplace.WorkplaceSearchRequest;
 import ru.irlix.booking.dto.workplace.WorkplaceUpdateRequest;
+import ru.irlix.booking.entity.Workplace;
 
 import java.util.List;
 import java.util.UUID;
@@ -64,4 +65,12 @@ public interface WorkplaceService {
      * @return - страница с рабочими местами
      */
     Page<WorkplaceResponse> search(WorkplaceSearchRequest searchRequest, Pageable pageable);
+
+    /**
+     * Получить рабочее место по id с проверкой на null
+     *
+     * @param id - id рабочего места
+     * @return - найденное рабочее место
+     */
+    Workplace optionalCheck(UUID id);
 }

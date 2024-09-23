@@ -6,6 +6,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.irlix.booking.dto.booking.BookingCancelRequest;
 import ru.irlix.booking.dto.booking.BookingCreateRequest;
 import ru.irlix.booking.dto.booking.BookingResponse;
+import ru.irlix.booking.dto.booking.BookingSearchRequest;
 import ru.irlix.booking.service.BookingService;
 
 import java.util.List;
@@ -42,6 +47,19 @@ public class BookingController {
     })
     public List<BookingResponse> getAll() {
         return bookingService.getAll();
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Получить список бронирований с пагинацией и сортировкой",
+            description = "Возвращает статус 200 и список бронирований")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Запрос прошел успешно"),
+            @ApiResponse(responseCode = "403", description = "Недостаточно прав")
+    })
+    public Page<BookingResponse> search(
+            @RequestBody @Param(value = "Фильтр") @Valid BookingSearchRequest searchRequest,
+            @PageableDefault(sort = "isBooked") Pageable pageable) {
+        return bookingService.findAll(searchRequest, pageable);
     }
 
     @GetMapping("/{id}")
