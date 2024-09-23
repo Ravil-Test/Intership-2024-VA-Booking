@@ -105,7 +105,7 @@ public class WorkplaceServiceImpl implements WorkplaceService {
      * @param id - id рабочего места
      * @return - найденное рабочее место
      */
-    protected Workplace optionalCheck(UUID id) {
+    public Workplace optionalCheck(UUID id) {
         return workplaceRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Workplace with id " + id + " not found"));
     }

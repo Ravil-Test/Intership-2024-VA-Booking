@@ -27,7 +27,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"id", "cancelReason", "workplace"})
+@ToString(exclude = {"id", "cancelReason", "workplace", "user"})
 @Table(name = "booking")
 public class Booking {
 

@@ -8,6 +8,7 @@ import ru.irlix.booking.dto.user.UserCreateRequest;
 import ru.irlix.booking.dto.user.UserResponse;
 import ru.irlix.booking.dto.user.UserSearchRequest;
 import ru.irlix.booking.dto.user.UserUpdateRequest;
+import ru.irlix.booking.entity.User;
 
 import java.util.List;
 import java.util.UUID;
@@ -63,4 +64,12 @@ public interface UserService {
      * @param id - id пользователя
      */
     void delete(@NotNull UUID id);
+
+    /**
+     * Получить пользователя с проверкой на null
+     *
+     * @param id - id пользователя
+     * @return - найденный пользователь
+     */
+    User getUserWithNullCheck(UUID id);
 }
