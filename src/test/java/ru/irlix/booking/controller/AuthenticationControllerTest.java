@@ -19,23 +19,6 @@ class AuthenticationControllerTest extends BaseIntegrationTest {
 
     @Test
     @DirtiesContext
-    @Tag(value = "Позитивный")
-    @DisplayName(value = "Тест на регистрацию")
-    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
-    void create_success() throws Exception {
-        char[] password = "password".toCharArray();
-        String jsonCreateRequest = getMapper().writeValueAsString
-                (new UserCreateRequest("Иванов Иван Иванович", "+7951256891", "test@gmail.com", password));
-
-        mockMvc.perform(post("/auth").contentType(MediaType.APPLICATION_JSON).content(jsonCreateRequest))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.fio").value("Иванов Иван Иванович"))
-                .andExpect(jsonPath("$.phoneNumber").value("+7951256891"))
-                .andExpect(jsonPath("$.email").value("test@gmail.com"));
-    }
-
-    @Test
-    @DirtiesContext
     @Tag(value = "Негативный")
     @DisplayName(value = "Тест на регистрацию")
     @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")

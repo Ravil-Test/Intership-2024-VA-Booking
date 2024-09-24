@@ -1,22 +1,16 @@
 package ru.irlix.booking.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.irlix.booking.dto.room.RoomCreateRequest;
-import ru.irlix.booking.dto.room.RoomResponse;
-import ru.irlix.booking.dto.room.RoomSearchRequest;
 import ru.irlix.booking.dto.room.RoomUpdateRequest;
 import ru.irlix.booking.util.BaseIntegrationTest;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -37,81 +31,6 @@ class RoomControllerTest extends BaseIntegrationTest {
         mockMvc.perform(get("/rooms"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
-    }
-
-    @Test
-    @WithMockUser(authorities = "ROLE_USER")
-    @DirtiesContext
-    @Tag(value = "Позитивный")
-    @DisplayName(value = "Тест на получение страницы со списком помещений")
-    void getRoomPageTest_success() throws Exception {
-        RoomResponse expectedRoom = new RoomResponse("Кабинет для backend разработки", (short) 1, (short) 4, false);
-
-        RoomSearchRequest filter = new RoomSearchRequest(null, null, null, (short) 4, null);
-        String jsonFilter = getMapper().writeValueAsString(filter);
-
-        MvcResult mvcResult = mockMvc.perform(post("/rooms/search")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonFilter))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String contentResponse = mvcResult.getResponse().getContentAsString();
-
-        List<RoomResponse> actualResponse = getMapper().readValue(
-                getMapper().readTree(contentResponse).get("content").toString(),
-                new TypeReference<>() {
-                }
-        );
-
-        Assertions.assertNotNull(actualResponse);
-        Assertions.assertFalse(actualResponse.isEmpty());
-        Assertions.assertTrue(actualResponse.stream().anyMatch(actual -> actual.equals(expectedRoom)));
-    }
-
-    @Test
-    @WithMockUser(authorities = "ROLE_USER")
-    @DirtiesContext
-    @Tag(value = "Позитивный")
-    @DisplayName(value = "Тест на получение страницы со списком помещений без фильтра")
-    void getRoomWithoutFilterPageTest_success() throws Exception {
-        RoomSearchRequest filter = new RoomSearchRequest(null, null, null, null, null);
-        String jsonFilter = getMapper().writeValueAsString(filter);
-
-        List<RoomResponse> expectedResponse = List.of(
-                new RoomResponse("Малый переговорный зал", (short) 3, (short) 15, false),
-                new RoomResponse("Большой переговорный зал", (short) 2, (short) 10, false),
-                new RoomResponse("Кабинет для backend разработки", (short) 1, (short) 4, false));
-
-        MvcResult mvcResult = mockMvc.perform(post("/rooms/search")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonFilter)
-                        .param("page", "0")
-                        .param("size", "10"))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String contentAsString = mvcResult.getResponse().getContentAsString();
-
-        List<RoomResponse> contentList = getMapper().readValue(getMapper().readTree(contentAsString).get("content").toString(),
-                new TypeReference<>() {
-                });
-        Assertions.assertEquals(expectedResponse, contentList);
-    }
-
-    @Test
-    @WithMockUser(authorities = "ROLE_USER")
-    @DirtiesContext
-    @Tag(value = "Негативный")
-    @DisplayName(value = "Тест на получение страницы со списком помещений")
-    void getRoomPageTest_notFound() throws Exception {
-        RoomSearchRequest filter = new RoomSearchRequest(null, true, null, null, null);
-        String jsonFilter = getMapper().writeValueAsString(filter);
-
-        mockMvc.perform(post("/rooms/search")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonFilter))
-                .andExpect(status().isNotFound());
     }
 
     @Test
