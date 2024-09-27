@@ -148,6 +148,6 @@ class UserServiceImplTest extends BaseIntegrationTest {
 
         Optional<User> deletedRoom = userRepository.findById(userId);
         assertTrue(deletedRoom.isPresent());
-        assertTrue(deletedRoom.get().isDelete());
+        assertTrue(deletedRoom.get().getIsDelete());
     }
 }

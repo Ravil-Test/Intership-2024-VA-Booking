@@ -1,9 +1,15 @@
 package ru.irlix.booking.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -14,11 +20,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.irlix.booking.dto.breakagerequest.BreakageRequestCreate;
 import ru.irlix.booking.dto.breakagerequest.BreakageRequestUpdate;
 import ru.irlix.booking.dto.breakagerequest.BreakageResponse;
+import ru.irlix.booking.dto.breakagerequest.BreakageSearchRequest;
 import ru.irlix.booking.service.BreakageRequestService;
 
 import java.util.List;
@@ -47,6 +55,23 @@ public class BreakageRequestController {
             description = "Возвращает статус 200 и заявку о поломке")
     public BreakageResponse getById(@PathVariable UUID id) {
         return breakageRequestService.getById(id);
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Получить список заявок о поломке оборудования",
+            description = "Возвращает статус 200 и список заявок")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Запрос прошел успешно"),
+            @ApiResponse(responseCode = "403", description = "Недостаточно прав"),
+            @ApiResponse(responseCode = "404", description = "Поломок с таким фильтром не найдено")
+    })
+    public Page<BreakageResponse> search(@RequestBody(required = false) @Parameter(description = "Фильтр заявок")
+                                         @Valid BreakageSearchRequest searchRequest,
+                                         @RequestParam(name = "page", defaultValue = "0") @Min(value = 0,
+                                                 message = "Страница не может быть отрицательным числом") int page,
+                                         @RequestParam(name = "size", defaultValue = "10") @Min(value = 1,
+                                                 message = "Число отображаемых объектов не может быть меньше 1") int size) {
+        return breakageRequestService.search(PageRequest.of(page, size), searchRequest);
     }
 
     @PostMapping

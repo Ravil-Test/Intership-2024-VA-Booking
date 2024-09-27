@@ -2,9 +2,12 @@ package ru.irlix.booking.service;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import ru.irlix.booking.dto.breakagerequest.BreakageRequestCreate;
 import ru.irlix.booking.dto.breakagerequest.BreakageRequestUpdate;
 import ru.irlix.booking.dto.breakagerequest.BreakageResponse;
+import ru.irlix.booking.dto.breakagerequest.BreakageSearchRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +31,15 @@ public interface BreakageRequestService {
      * @return - найденая по id заявка
      */
     BreakageResponse getById(@NotNull UUID id);
+
+    /**
+     * Фильтр для поиска заявок о поломке
+     *
+     * @param pageable - пагинация
+     * @param breakageRequest - ДТО заявки для поиска
+     * @return - список пользователей
+     */
+    Page<BreakageResponse> search(Pageable pageable, BreakageSearchRequest breakageRequest);
 
     /**
      * Создание заявки о поломке

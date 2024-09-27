@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="2024-08-28--insert-into-table-breakage_request" author="Alexandr_Makutsevich">
+
+        <preConditions>
+            <tableExists tableName="breakage_request"/>
+        </preConditions>
+
+        <insert tableName="breakage_request">
+            <column name="id" value="00000000-0000-0000-0000-222111111222"/>
+            <column name="request_date_time" value="NOW()"/>
+            <column name="description" value="Test breakage 3"/>
+            <column name="workplace_id" value="88888888-8888-8888-8888-888888888888"/>
+            <column name="is_completed" value="true"/>
+            <column name="is_canceled" value="false"/>
+            <column name="user_id" value="13131313-1313-1313-1313-131313131313"/>
+        </insert>
+
+        <insert tableName="breakage_request">
+            <column name="id" value="00000000-0000-0000-0000-111222222111"/>
+            <column name="request_date_time" value="NOW()"/>
+            <column name="description" value="Test breakage 4"/>
+            <column name="workplace_id" value="88888888-8888-8888-8888-888888888888"/>
+            <column name="is_completed" value="true"/>
+            <column name="is_canceled" value="false"/>
+            <column name="user_id" value="13131313-1313-1313-1313-131313131313"/>
+        </insert>
+
+        <insert tableName="breakage_request">
+            <column name="id" value="00000000-0000-0000-0000-111221122111"/>
+            <column name="request_date_time" value="NOW()"/>
+            <column name="description" value="Test breakage 5"/>
+            <column name="workplace_id" value="88888888-8888-8888-8888-888888888888"/>
+            <column name="is_completed" value="true"/>
+            <column name="is_canceled" value="false"/>
+            <column name="user_id" value="13131313-1313-1313-1313-131313131313"/>
+        </insert>
+
+    </changeSet>
+</databaseChangeLog>

@@ -53,7 +53,7 @@ public class BreakageRequest {
     @Column(name = "is_canceled")
     private boolean isCanceled;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinColumn(name = "workplace_id", referencedColumnName = "id")
     private Workplace workplace;
 
