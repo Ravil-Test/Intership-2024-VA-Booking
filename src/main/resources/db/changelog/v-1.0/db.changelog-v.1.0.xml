@@ -27,5 +27,6 @@
     <include file="08-2024/2024-08-30--insert-into-table-bookings.xml" relativeToChangelogFile="true"/>
     <include file="09-2024/2024-09-19--insert-into-user-table.xml" relativeToChangelogFile="true"/>
     <include file="09-2024/2024-09-19--insert-into-user_role-table.xml" relativeToChangelogFile="true"/>
+    <include file="09-2024/2024-09-23--insert-into-table-breakage_request.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

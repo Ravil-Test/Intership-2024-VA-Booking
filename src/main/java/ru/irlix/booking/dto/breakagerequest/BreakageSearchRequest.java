@@ -2,16 +2,15 @@ package ru.irlix.booking.dto.breakagerequest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import ru.irlix.booking.dto.user.UserBreakageResponse;
-import ru.irlix.booking.dto.workplace.WorkplaceBreakageResponse;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
- * Запрос на получение заявки о поломке
+ * Запрос на фильтр заявки о поломке
  * DTO for {@link ru.irlix.booking.entity.BreakageRequest}
  */
-public record BreakageResponse(
+public record BreakageSearchRequest(
 
         @Schema(title = "Время создания заявки", example = "2024-08-30 12:11:50.077721")
         @JsonProperty(value = "requestDateTime")
@@ -23,17 +22,17 @@ public record BreakageResponse(
 
         @Schema(title = "Статус выполнения заявки", example = "false")
         @JsonProperty(value = "isComplete")
-        boolean isComplete,
+        Boolean isComplete,
 
         @Schema(title = "Статус отмены заявки", example = "false")
         @JsonProperty(value = "isCanceled")
-        boolean isCanceled,
+        Boolean isCanceled,
 
-        @Schema(title = "Информация о рабочем месте", example = "рабочее место, где произошла поломка оборудования")
-        @JsonProperty(value = "workplace")
-        WorkplaceBreakageResponse workplace,
+        @Schema(title = "ID рабочего места", example = "55555555-5555-5555-5555-555555555555")
+        @JsonProperty(value = "workplace_id")
+        UUID workplaceId,
 
-        @Schema(title = "Информация о пользователе", example = "пользователь, у которого произошла поломка оборудования")
-        @JsonProperty(value = "user")
-        UserBreakageResponse user) {
+        @Schema(title = "ID пользователя", example = "12121212-1212-1212-1212-121212121212")
+        @JsonProperty(value = "user_id")
+        UUID userId) {
 }

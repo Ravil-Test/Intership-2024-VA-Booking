@@ -88,7 +88,7 @@ public class User {
     @Column(name = "is_delete", nullable = false)
     @Schema(title = "Статус пользователя (удален/не удален)",
             example = "false")
-    private boolean isDelete;
+    private Boolean isDelete;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

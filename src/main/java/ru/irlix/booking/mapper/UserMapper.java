@@ -19,11 +19,11 @@ import java.util.List;
         uses = {BookingMapper.class, BreakageRequestMapper.class})
 public interface UserMapper {
 
-    @Mapping(target = "isDelete", source = "delete")
+    @Mapping(target = "isDelete", source = "isDelete")
     UserResponse entityToResponse(User user);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "delete", ignore = true)
+    @Mapping(target = "isDelete", constant = "false")
     @Mapping(target = "availableMinutesForBooking", constant = "30")
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "bookings", ignore = true)
@@ -31,7 +31,7 @@ public interface UserMapper {
     User createRequestToEntity(UserCreateRequest createRequest);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "delete", ignore = true)
+    @Mapping(target = "isDelete", ignore = true)
     @Mapping(target = "availableMinutesForBooking", ignore = true)
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "bookings", ignore = true)
