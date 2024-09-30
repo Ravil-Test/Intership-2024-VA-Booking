@@ -94,7 +94,7 @@ class RoomServiceImplTest extends BaseIntegrationTest {
         RoomSearchRequest searchRequest = new RoomSearchRequest("Small meeting room", false, (short) 3, (short) 15, null);
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<RoomResponse> roomPage = roomService.getRoomsWithFilters(searchRequest, pageable);
+        Page<RoomResponse> roomPage = roomService.search(searchRequest, pageable);
         List<RoomResponse> actualResponse = roomPage.getContent();
 
         assertNotNull(actualResponse);
@@ -114,7 +114,7 @@ class RoomServiceImplTest extends BaseIntegrationTest {
         RoomSearchRequest filter = new RoomSearchRequest(null, null, null, null, null);
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<RoomResponse> roomPage = roomService.getRoomsWithFilters(filter, pageable);
+        Page<RoomResponse> roomPage = roomService.search(filter, pageable);
         List<RoomResponse> actualContent = roomPage.getContent();
         assertNotNull(actualContent);
         assertFalse(actualContent.isEmpty());
@@ -130,7 +130,7 @@ class RoomServiceImplTest extends BaseIntegrationTest {
         RoomSearchRequest filter = new RoomSearchRequest("Not found test", null, null, null, null);
         Pageable pageable = PageRequest.of(0, 10);
 
-        Assertions.assertThrows(EntityNotFoundException.class, () -> roomService.getRoomsWithFilters(filter, pageable));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> roomService.search(filter, pageable));
     }
 
     @Test
@@ -204,8 +204,8 @@ class RoomServiceImplTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Негативный")
     @DisplayName(value = "Тест на получение помещения по id с проверкой на null")
-    void getRoomWithNullCheckTest_notFound() throws EntityNotFoundException {
+    void getRoomByIdTest_notFound() throws EntityNotFoundException {
         UUID id = UUID.randomUUID();
-        assertThrows(EntityNotFoundException.class, () -> roomService.getRoomWithNullCheck(id));
+        assertThrows(EntityNotFoundException.class, () -> roomService.getRoomById(id));
     }
 }

@@ -63,7 +63,7 @@ public interface OfficeService {
      * @param id - id офиса
      * @return - найденный офис
      */
-    Office optionalCheck(UUID id);
+    Office getOfficeById(UUID id);
 
     /**
      * Получить страницу со списком офисов по фильтру
@@ -72,5 +72,5 @@ public interface OfficeService {
      * @param pageable      - пагинация
      * @return - страница со списков рабочих мест
      */
-    Page<OfficeResponse> getAllWithPagingAndSorting(OfficeSearchRequest searchRequest, Pageable pageable);
+    Page<OfficeResponse> search(OfficeSearchRequest searchRequest, Pageable pageable);
 }

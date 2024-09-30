@@ -1,10 +1,16 @@
 package ru.irlix.booking.specification;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import ru.irlix.booking.entity.Workplace;
 
 import java.util.UUID;
 
+/**
+ * Фильтр рабочих мест
+ */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WorkplaceSpecification {
 
     public static Specification<Workplace> isDeleted(Boolean isDelete) {

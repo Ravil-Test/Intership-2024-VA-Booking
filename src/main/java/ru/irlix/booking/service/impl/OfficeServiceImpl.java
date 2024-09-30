@@ -34,7 +34,7 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     public OfficeResponse getById(UUID id) {
-        Office foundOffice = optionalCheck(id);
+        Office foundOffice = getOfficeById(id);
         log.info("Get office with id: {} : {}", id, foundOffice);
         return officeMapper.entityToResponse(foundOffice);
     }
@@ -45,7 +45,7 @@ public class OfficeServiceImpl implements OfficeService {
     }
 
     @Override
-    public Page<OfficeResponse> getAllWithPagingAndSorting(OfficeSearchRequest searchRequest, Pageable pageable) {
+    public Page<OfficeResponse> search(OfficeSearchRequest searchRequest, Pageable pageable) {
         Specification<Office> spec = Specification.where(null);
 
         if (StringUtils.hasText(searchRequest.address())) {
@@ -75,7 +75,7 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     public OfficeResponse update(UUID id, @NonNull OfficeUpdateRequest updateRequest) {
-        Office currentOffice = optionalCheck(id);
+        Office currentOffice = getOfficeById(id);
         Office update = officeMapper.updateRequestToEntity(updateRequest);
 
         Optional.ofNullable(update.getName()).ifPresent(currentOffice::setName);
@@ -101,7 +101,7 @@ public class OfficeServiceImpl implements OfficeService {
      * @return - найденный офис
      */
     @Override
-    public Office optionalCheck(UUID id) {
+    public Office getOfficeById(UUID id) {
         return officeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Office with id " + id + " not found"));
     }

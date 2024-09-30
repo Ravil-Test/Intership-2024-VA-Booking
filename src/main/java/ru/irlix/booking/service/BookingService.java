@@ -8,6 +8,7 @@ import ru.irlix.booking.dto.booking.BookingCancelRequest;
 import ru.irlix.booking.dto.booking.BookingCreateRequest;
 import ru.irlix.booking.dto.booking.BookingResponse;
 import ru.irlix.booking.dto.booking.BookingSearchRequest;
+import ru.irlix.booking.entity.Booking;
 
 import java.util.List;
 import java.util.UUID;
@@ -57,8 +58,16 @@ public interface BookingService {
      * Поиск и сортировка бронирований
      *
      * @param searchRequest - фильтр
-     * @param pageable - пагинация
+     * @param pageable      - пагинация
      * @return - страница с бронированиями
      */
-    Page<BookingResponse> findAll(BookingSearchRequest searchRequest, Pageable pageable);
+    Page<BookingResponse> search(BookingSearchRequest searchRequest, Pageable pageable);
+
+    /**
+     * Получить бронирование с проверкой на null
+     *
+     * @param id - id бронирование
+     * @return - найденное бронирование
+     */
+    Booking getBookingById(UUID id);
 }

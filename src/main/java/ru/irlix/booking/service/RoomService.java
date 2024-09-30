@@ -59,19 +59,19 @@ public interface RoomService {
     void delete(@NotNull UUID id);
 
     /**
-     * Получить помещение и проверить на null
-     *
-     * @param id - id помещения
-     * @return - найденное помещение
-     */
-    Room getRoomWithNullCheck(@NotNull UUID id);
-
-    /**
      * Получить страницу со списком помещений с фильтром
      *
      * @param searchRequest - фильтр
      * @param pageable      - пагинация
      * @return - страница со списком помещений
      */
-    Page<RoomResponse> getRoomsWithFilters(RoomSearchRequest searchRequest, Pageable pageable);
+    Page<RoomResponse> search(RoomSearchRequest searchRequest, Pageable pageable);
+
+    /**
+     * Получить помещение с проверкой на null
+     *
+     * @param id - id помещения
+     * @return - найденное помещение
+     */
+    Room getRoomById(UUID id);
 }

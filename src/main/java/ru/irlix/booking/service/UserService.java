@@ -37,7 +37,7 @@ public interface UserService extends UserDetailsService {
     /**
      * Фильтр для поиска пользователей
      *
-     * @param pageable - пагинация
+     * @param pageable   - пагинация
      * @param useRequest - ДТО пользователя для поиска
      * @return - список пользователей
      */

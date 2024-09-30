@@ -1,11 +1,14 @@
 package ru.irlix.booking.specification;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import ru.irlix.booking.entity.Office;
 
 /**
  * Фильтр офисов
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OfficeSpecifications {
 
     public static Specification<Office> hasName(String name) {

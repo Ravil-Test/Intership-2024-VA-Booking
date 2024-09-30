@@ -24,5 +24,5 @@ public interface AuthenticationService {
      * @param createRequest - новый пользователь
      * @return - созданный пользователь
      */
-    UserResponse create(UserCreateRequest createRequest);
+    UserResponse registration(UserCreateRequest createRequest);
 }

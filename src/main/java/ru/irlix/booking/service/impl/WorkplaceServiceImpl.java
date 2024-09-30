@@ -35,7 +35,7 @@ public class WorkplaceServiceImpl implements WorkplaceService {
 
     @Override
     public WorkplaceResponse getById(UUID id) {
-        Workplace foundWorkplace = optionalCheck(id);
+        Workplace foundWorkplace = getWorkplaceById(id);
         log.info("Get workplace with id: {}: {}", id, foundWorkplace);
 
         return workplaceMapper.entityToResponse(foundWorkplace);
@@ -68,7 +68,7 @@ public class WorkplaceServiceImpl implements WorkplaceService {
     public WorkplaceResponse save(@NonNull WorkplaceCreateRequest createRequest) {
         Workplace forSave = workplaceMapper.createRequestToEntity(createRequest);
 
-        forSave.setRoom(roomService.getRoomWithNullCheck(createRequest.roomId()));
+        forSave.setRoom(roomService.getRoomById(createRequest.roomId()));
 
         Workplace saved = workplaceRepository.save(forSave);
         log.info("Save workplace: {} ", saved);
@@ -78,11 +78,12 @@ public class WorkplaceServiceImpl implements WorkplaceService {
 
     @Override
     public WorkplaceResponse update(UUID id, @NonNull WorkplaceUpdateRequest updateRequest) {
-        Workplace currentWorkplace = optionalCheck(id);
+        Workplace currentWorkplace = getWorkplaceById(id);
         Workplace update = workplaceMapper.updateRequestToEntity(updateRequest);
 
-        if (Optional.ofNullable(updateRequest.roomId()).isPresent())
-            update.setRoom(roomService.getRoomWithNullCheck(updateRequest.roomId()));
+        if (Optional.ofNullable(updateRequest.roomId()).isPresent()) {
+            update.setRoom(roomService.getRoomById(updateRequest.roomId()));
+        }
         Optional.ofNullable(update.getNumber()).ifPresent(currentWorkplace::setNumber);
         Optional.ofNullable(update.getDescription()).ifPresent(currentWorkplace::setDescription);
 
@@ -99,14 +100,9 @@ public class WorkplaceServiceImpl implements WorkplaceService {
         log.info("Delete workplace with id: {}", id);
     }
 
-    /**
-     * Получить рабочее место по id с проверкой на null
-     *
-     * @param id - id рабочего места
-     * @return - найденное рабочее место
-     */
-    public Workplace optionalCheck(UUID id) {
-        return workplaceRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Workplace with id " + id + " not found"));
+    @Override
+    public Workplace getWorkplaceById(UUID id) {
+        return workplaceRepository.findById(id).orElseThrow(()
+                -> new EntityNotFoundException("Workplace with id " + id + " not found"));
     }
 }

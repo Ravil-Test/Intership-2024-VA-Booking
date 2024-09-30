@@ -89,7 +89,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public UserResponse create(@RequestBody @Valid UserCreateRequest createRequest) {
+    public UserResponse save(@RequestBody @Valid UserCreateRequest createRequest) {
         return userService.save(createRequest);
     }
 

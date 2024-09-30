@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public UserResponse getById(UUID id) {
         User user = getUserById(id);
         log.info("Получение пользователя по id: {} : {}", id, user);
@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<UserResponse> getAll() {
         return userMapper
                 .entityListToResponseList(userRepository.findAll());
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
 
         User createUser = userMapper.createRequestToEntity(createRequest);
 
-        Role defaultRole = roleService.getRoleByName(DEFAULT_ROLE);
+        Role defaultRole = roleService.getByName(DEFAULT_ROLE);
         createUser.setRoles(Set.of(defaultRole));
         createUser.setPassword(passwordEncoder.passwordEncoder().encode(String.valueOf(createUser.getPassword())).toCharArray());
         User saveUser = userRepository.save(createUser);

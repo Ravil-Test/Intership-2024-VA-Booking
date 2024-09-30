@@ -7,7 +7,6 @@ import java.util.List;
 
 /**
  * Запрос на получение сообщения об ошибке валидации
- *
  */
 public record ValidationErrorResponse(
 

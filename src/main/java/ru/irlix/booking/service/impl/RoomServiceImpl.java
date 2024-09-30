@@ -36,7 +36,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public RoomResponse getById(UUID id) {
-        Room room = getRoomWithNullCheck(id);
+        Room room = getRoomById(id);
         log.info("Получение помещения по id: {} : {}", id, room);
         return roomMapper.entityToResponse(room);
     }
@@ -48,7 +48,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Page<RoomResponse> getRoomsWithFilters(RoomSearchRequest searchRequest, Pageable pageable) {
+    public Page<RoomResponse> search(RoomSearchRequest searchRequest, Pageable pageable) {
         Specification<Room> spec = Specification.where(null);
 
         if (StringUtils.hasText(searchRequest.name())) {
@@ -79,7 +79,7 @@ public class RoomServiceImpl implements RoomService {
     public RoomResponse save(@NonNull RoomCreateRequest createRequest) {
         Room createRoom = roomMapper.createRequestToEntity(createRequest);
 
-        createRoom.setOffice(officeService.optionalCheck(createRequest.officeId()));
+        createRoom.setOffice(officeService.getOfficeById(createRequest.officeId()));
 
         Room saveRoom = roomRepository.save(createRoom);
         log.info("Создание помещения {}", createRoom);
@@ -89,11 +89,11 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     public RoomResponse update(UUID id, @NonNull RoomUpdateRequest updateRequest) {
-        Room currentRoom = getRoomWithNullCheck(id);
+        Room currentRoom = getRoomById(id);
         Room updateRoom = roomMapper.updateRequestToEntity(updateRequest);
 
         if (Optional.ofNullable(updateRequest.officeId()).isPresent())
-            updateRoom.setOffice(officeService.optionalCheck(updateRequest.officeId()));
+            updateRoom.setOffice(officeService.getOfficeById(updateRequest.officeId()));
         Optional.ofNullable(updateRoom.getName()).ifPresent(currentRoom::setName);
         Optional.ofNullable(updateRoom.getFloorNumber()).ifPresent(currentRoom::setFloorNumber);
         Optional.ofNullable(updateRoom.getRoomNumber()).ifPresent(currentRoom::setRoomNumber);
@@ -107,20 +107,14 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     public void delete(UUID id) {
-        if (getRoomWithNullCheck(id) != null)
+        if (getRoomById(id) != null)
             roomRepository.changeRoomIsDeleted(id, true);
         log.info("Помещение с id {} удалено", id);
     }
 
-    /**
-     * Получить помещение с проверкой на null
-     *
-     * @param id - id помещения
-     * @return - найденное помещение
-     */
     @Override
-    public Room getRoomWithNullCheck(UUID id) {
+    public Room getRoomById(UUID id) {
         return roomRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(("Помещение с заданным id - " + id + " не найдено")));
+                .orElseThrow(() -> new EntityNotFoundException("Помещение с заданным id - " + id + " не найдено"));
     }
 }

@@ -39,8 +39,8 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "403", description = "Недостаточно прав"),
             @ApiResponse(responseCode = "401", description = "Не авторизован")
     })
-    public UserResponse create(@RequestBody @Valid UserCreateRequest createRequest) {
-        return authenticationService.create(createRequest);
+    public UserResponse registration(@RequestBody @Valid UserCreateRequest createRequest) {
+        return authenticationService.registration(createRequest);
     }
 
     @PostMapping("/login")

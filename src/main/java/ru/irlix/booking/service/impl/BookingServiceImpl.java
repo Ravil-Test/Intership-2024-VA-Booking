@@ -42,7 +42,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponse getById(UUID id) {
-        Booking foundBooking = getBookingWithNullCheck(id);
+        Booking foundBooking = getBookingById(id);
         log.info("Get booking with id: {} : {}", id, foundBooking);
         return bookingMapper.entityToResponse(foundBooking);
     }
@@ -52,7 +52,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingMapper.createRequestToEntity(createRequest);
 
         booking.setUser(userService.getUserById(createRequest.userID()));
-        booking.setWorkplace(workplaceService.optionalCheck(createRequest.workplaceID()));
+        booking.setWorkplace(workplaceService.getWorkplaceById(createRequest.workplaceID()));
 
         Booking savedBooking = bookingRepository.save(booking);
         log.info("Created booking : {}", savedBooking);
@@ -62,7 +62,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponse cancel(UUID id, @NonNull BookingCancelRequest updateRequest) {
-        Booking currentBooking = getBookingWithNullCheck(id);
+        Booking currentBooking = getBookingById(id);
         Booking updateForBooking = bookingMapper.cancelRequestToEntity(updateRequest);
 
         Optional.ofNullable(updateForBooking.getCancelReason()).ifPresent(currentBooking::setCancelReason);
@@ -81,7 +81,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Page<BookingResponse> findAll(BookingSearchRequest searchRequest, Pageable pageable) {
+    public Page<BookingResponse> search(BookingSearchRequest searchRequest, Pageable pageable) {
         Specification<Booking> specification = Specification.where(null);
 
         if (searchRequest.userId() != null) {
@@ -101,13 +101,8 @@ public class BookingServiceImpl implements BookingService {
         return responsePage.map(bookingMapper::entityToResponse);
     }
 
-    /**
-     * Получить бронирование с проверкой на null
-     *
-     * @param id - id бронирование
-     * @return - найденное бронирование
-     */
-    private Booking getBookingWithNullCheck(UUID id) {
+    @Override
+    public Booking getBookingById(UUID id) {
         return bookingRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Booking with id " + id + " not found"));
     }

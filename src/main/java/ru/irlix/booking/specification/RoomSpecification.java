@@ -1,5 +1,7 @@
 package ru.irlix.booking.specification;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import ru.irlix.booking.entity.Room;
 
@@ -8,6 +10,7 @@ import java.util.UUID;
 /**
  * Фильтр помещений
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RoomSpecification {
 
     public static Specification<Room> hasName(String name) {

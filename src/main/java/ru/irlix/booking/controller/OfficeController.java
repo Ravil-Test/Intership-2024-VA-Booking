@@ -60,10 +60,10 @@ public class OfficeController {
             @ApiResponse(responseCode = "200", description = "Запрос прошел успешно"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public Page<OfficeResponse> getOfficePage(
+    public Page<OfficeResponse> search(
             @RequestBody @Param(value = "Фильтр") @Valid OfficeSearchRequest searchRequest,
             @PageableDefault(sort = "name") Pageable pageable) {
-        return officeService.getAllWithPagingAndSorting(searchRequest, pageable);
+        return officeService.search(searchRequest, pageable);
     }
 
     @GetMapping("/{id}")
@@ -75,7 +75,7 @@ public class OfficeController {
             @ApiResponse(responseCode = "404", description = "Офис не найден"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public OfficeResponse getOfficeById(@PathVariable UUID id) {
+    public OfficeResponse getById(@PathVariable UUID id) {
         return officeService.getById(id);
     }
 
@@ -89,7 +89,7 @@ public class OfficeController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public OfficeResponse createOffice(@RequestBody @Valid OfficeCreateRequest createRequest) {
+    public OfficeResponse save(@RequestBody @Valid OfficeCreateRequest createRequest) {
         return officeService.save(createRequest);
     }
 
@@ -103,7 +103,7 @@ public class OfficeController {
             @ApiResponse(responseCode = "404", description = "Офис не найден"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public OfficeResponse updateOffice(@PathVariable UUID id, @RequestBody @Valid OfficeUpdateRequest updateRequest) {
+    public OfficeResponse update(@PathVariable UUID id, @RequestBody @Valid OfficeUpdateRequest updateRequest) {
         return officeService.update(id, updateRequest);
     }
 
@@ -117,7 +117,7 @@ public class OfficeController {
             @ApiResponse(responseCode = "404", description = "Офис не найден"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public void deleteOffice(@PathVariable UUID id) {
+    public void delete(@PathVariable UUID id) {
         officeService.delete(id);
     }
 }
