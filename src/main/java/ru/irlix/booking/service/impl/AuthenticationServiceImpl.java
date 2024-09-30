@@ -40,7 +40,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public UserResponse create(UserCreateRequest createRequest) {
+    public UserResponse registration(UserCreateRequest createRequest) {
         return userService.save(createRequest);
     }
 }

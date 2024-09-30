@@ -100,7 +100,7 @@ class UserServiceImplTest extends BaseIntegrationTest {
         UserCreateRequest createRequest = new UserCreateRequest("Petrova Marina Petrovna",
                 "79142480689", "petrova@rambler.ru", "password123".toCharArray());
 
-        Role defaultRole = roleService.getRoleByName("USER");
+        Role defaultRole = roleService.getByName("USER");
         UserResponse savedResponse = userService.save(createRequest);
 
         assertNotNull(defaultRole, "Роль по умолчанию не найдена");

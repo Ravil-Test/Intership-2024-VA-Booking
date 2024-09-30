@@ -1,8 +1,14 @@
 package ru.irlix.booking.specification;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import ru.irlix.booking.entity.User;
 
+/**
+ * Фильтр пользователей
+ */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserSpecification {
 
     public static Specification<User> hasFio(String fio) {

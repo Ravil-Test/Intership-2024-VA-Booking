@@ -60,10 +60,10 @@ public class RoomController {
             @ApiResponse(responseCode = "403", description = "Недостаточно прав"),
             @ApiResponse(responseCode = "400", description = "Некорректно переданные параметры")
     })
-    public Page<RoomResponse> getRooms(
+    public Page<RoomResponse> search(
             @RequestBody(required = false) @Parameter(description = "Фильтр для запроса") @Valid RoomSearchRequest searchRequest,
             Pageable pageable) {
-        return roomService.getRoomsWithFilters(searchRequest, pageable);
+        return roomService.search(searchRequest, pageable);
     }
 
     @GetMapping("/{id}")
@@ -89,7 +89,7 @@ public class RoomController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public RoomResponse create(@RequestBody @Valid RoomCreateRequest createRequest) {
+    public RoomResponse save(@RequestBody @Valid RoomCreateRequest createRequest) {
         return roomService.save(createRequest);
     }
 
@@ -103,8 +103,7 @@ public class RoomController {
             @ApiResponse(responseCode = "404", description = "Помещение не найдено"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public RoomResponse update(@PathVariable UUID id,
-                               @RequestBody @Valid RoomUpdateRequest updateRequest) {
+    public RoomResponse update(@PathVariable UUID id, @RequestBody @Valid RoomUpdateRequest updateRequest) {
         return roomService.update(id, updateRequest);
     }
 

@@ -61,7 +61,7 @@ public class BookingController {
     public Page<BookingResponse> search(
             @RequestBody @Param(value = "Фильтр") @Valid BookingSearchRequest searchRequest,
             @PageableDefault(sort = "isBooked") Pageable pageable) {
-        return bookingService.findAll(searchRequest, pageable);
+        return bookingService.search(searchRequest, pageable);
     }
 
     @GetMapping("/{id}")
@@ -87,7 +87,7 @@ public class BookingController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public BookingResponse create(@RequestBody @Valid BookingCreateRequest createRequest) {
+    public BookingResponse save(@RequestBody @Valid BookingCreateRequest createRequest) {
         return bookingService.save(createRequest);
     }
 

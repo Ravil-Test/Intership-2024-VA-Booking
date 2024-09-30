@@ -40,9 +40,9 @@ public class BreakageRequestServiceImpl implements BreakageRequestService {
     @Override
     @Transactional(readOnly = true)
     public BreakageResponse getById(UUID id) {
-        BreakageRequest breakageRequest = getBreakageRequestWithNullCheck(id);
+        BreakageRequest breakageRequest = getBreakageRequestById(id);
         log.info("Get breakage request by id: {} : {}", id, breakageRequest);
-        return breakageRequestMapper.entityToResponse(getBreakageRequestWithNullCheck(id));
+        return breakageRequestMapper.entityToResponse(getBreakageRequestById(id));
     }
 
     @Override
@@ -92,7 +92,7 @@ public class BreakageRequestServiceImpl implements BreakageRequestService {
 
     @Override
     public BreakageResponse update(UUID id, @NonNull BreakageRequestUpdate updateBreakageRequest) {
-        BreakageRequest currentBreakageRequest = getBreakageRequestWithNullCheck(id);
+        BreakageRequest currentBreakageRequest = getBreakageRequestById(id);
         BreakageRequest updatedBreakageRequest = breakageRequestMapper.updateRequestToEntity(updateBreakageRequest);
 
         Optional.ofNullable(updatedBreakageRequest.getDescription()).ifPresent(currentBreakageRequest::setDescription);
@@ -105,18 +105,18 @@ public class BreakageRequestServiceImpl implements BreakageRequestService {
 
     @Override
     public void delete(UUID id) {
-        BreakageRequest breakageRequest = getBreakageRequestWithNullCheck(id);
+        BreakageRequest breakageRequest = getBreakageRequestById(id);
         breakageRequestRepository.delete(breakageRequest);
         log.info("Deleted breakage request {}", breakageRequest);
     }
 
     /**
-     * Получить зяавку с проверкой на null
+     * Получить заявку с проверкой на null
      *
      * @param id - id заявки
      * @return - найденная заявка
      */
-    private BreakageRequest getBreakageRequestWithNullCheck(UUID id) {
+    private BreakageRequest getBreakageRequestById(UUID id) {
         return breakageRequestRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Breakage request with id " + id + " not found"));
     }

@@ -72,5 +72,5 @@ public interface WorkplaceService {
      * @param id - id рабочего места
      * @return - найденное рабочее место
      */
-    Workplace optionalCheck(UUID id);
+    Workplace getWorkplaceById(UUID id);
 }

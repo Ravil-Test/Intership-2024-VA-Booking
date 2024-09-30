@@ -1,5 +1,7 @@
 package ru.irlix.booking.specification;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import ru.irlix.booking.entity.Booking;
 
@@ -8,6 +10,7 @@ import java.util.UUID;
 /**
  * Фильтр бронирования
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookingSpecifications {
 
     public static Specification<Booking> hasUserId(UUID userId) {

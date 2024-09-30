@@ -70,7 +70,7 @@ public class RoleController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные"),
             @ApiResponse(responseCode = "403", description = "Недостаточно прав")
     })
-    public RoleResponse create(@RequestBody @Valid RoleCreateRequest createRequest) {
+    public RoleResponse save(@RequestBody @Valid RoleCreateRequest createRequest) {
         return roleService.save(createRequest);
     }
 

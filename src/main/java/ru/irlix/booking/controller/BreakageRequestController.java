@@ -79,7 +79,7 @@ public class BreakageRequestController {
     @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Создать заявку о поломке",
             description = "Возвращает статус 201 и созданную заявку о поломке")
-    public BreakageResponse createBreakageRequest(@RequestBody @Valid BreakageRequestCreate createRequest) {
+    public BreakageResponse save(@RequestBody @Valid BreakageRequestCreate createRequest) {
         return breakageRequestService.save(createRequest);
     }
 
@@ -87,8 +87,8 @@ public class BreakageRequestController {
     @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Обновить заявку о поломке",
             description = "Возвращает статус 200 и обновленную заявку о поломке")
-    public BreakageResponse updateBreakageRequest(@PathVariable UUID id,
-                                                  @RequestBody @Valid BreakageRequestUpdate updateRequest) {
+    public BreakageResponse update(@PathVariable UUID id,
+                                   @RequestBody @Valid BreakageRequestUpdate updateRequest) {
         return breakageRequestService.update(id, updateRequest);
     }
 
@@ -96,7 +96,7 @@ public class BreakageRequestController {
     @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Удалить заявку о поломке",
             description = "Возвращает статус 200 ")
-    public void deleteBreakageRequest(@PathVariable UUID id) {
+    public void delete(@PathVariable UUID id) {
         breakageRequestService.delete(id);
     }
 }

@@ -29,7 +29,7 @@ public interface RoleService {
      * @param name - название роли
      * @return - найденная роль
      */
-    Role getRoleByName(String name);
+    Role getByName(String name);
 
     /**
      * Получить список ролей

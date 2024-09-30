@@ -76,13 +76,13 @@ class OfficeServiceImplTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение страницы со списком офисов")
-    void getAllWithPagingAndSorting_success() {
+    void search_success() {
         OfficeSearchRequest filter = new OfficeSearchRequest("789 Oak St, Capital City", null, null);
         List<OfficeResponse> expectedResponse = List.of(
                 new OfficeResponse("789 Oak St, Capital City", "Remote Office", false));
 
         Pageable pageRequest = PageRequest.of(0, 10);
-        List<OfficeResponse> actualResponse = officeService.getAllWithPagingAndSorting(filter, pageRequest).getContent();
+        List<OfficeResponse> actualResponse = officeService.search(filter, pageRequest).getContent();
 
         Assertions.assertNotNull(actualResponse);
         Assertions.assertFalse(actualResponse.isEmpty());
@@ -144,10 +144,10 @@ class OfficeServiceImplTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение офиса  проверкой на null")
-    void optionalCheck_success() {
+    void getOfficeById_success() {
         UUID id = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
-        Office office = officeService.optionalCheck(id);
+        Office office = officeService.getOfficeById(id);
 
         Assertions.assertNotNull(office);
     }
@@ -156,8 +156,8 @@ class OfficeServiceImplTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Негативный")
     @DisplayName(value = "Тест на получение офиса  проверкой на null")
-    void optionalCheck_notFound() throws EntityNotFoundException {
+    void getOfficeById_notFound() throws EntityNotFoundException {
         UUID id = UUID.randomUUID();
-        Assertions.assertThrows(EntityNotFoundException.class, () -> officeService.optionalCheck(id));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> officeService.getOfficeById(id));
     }
 }

@@ -27,13 +27,13 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleResponse getById(UUID id) {
-        Role role = getRoleWithNullCheck(id);
+        Role role = getRoleById(id);
         log.info("Получение роли по id: {} : {}", id, role);
         return roleMapper.entityToResponse(role);
     }
 
     @Override
-    public Role getRoleByName(String name) {
+    public Role getByName(String name) {
         return roleRepository.findRoleByName(name);
     }
 
@@ -54,7 +54,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleResponse update(UUID id, @NonNull RoleUpdateRequest updateRequest) {
-        Role currentRole = getRoleWithNullCheck(id);
+        Role currentRole = getRoleById(id);
         Role updateRole = roleMapper.updateRequestToEntity(updateRequest);
 
         Optional.ofNullable(updateRole.getName()).ifPresent(currentRole::setName);
@@ -77,11 +77,8 @@ public class RoleServiceImpl implements RoleService {
      * @param id - id роли
      * @return - найденная роль
      */
-    private Role getRoleWithNullCheck(UUID id) {
+    private Role getRoleById(UUID id) {
         return roleRepository.findById(id)
-                .orElseThrow(
-                        () -> new EntityNotFoundException(("Роль с заданным id - "
-                                + id
-                                + " не найдена")));
+                .orElseThrow(() -> new EntityNotFoundException("Роль с заданным id - " + id + " не найдена"));
     }
 }

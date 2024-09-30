@@ -28,7 +28,7 @@ public interface BreakageRequestService {
      * Получить заявку по id
      *
      * @param id - id заявки
-     * @return - найденая по id заявка
+     * @return - найденная по id заявка
      */
     BreakageResponse getById(@NotNull UUID id);
 
