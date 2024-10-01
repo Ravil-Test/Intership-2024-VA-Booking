@@ -1,5 +1,6 @@
 package ru.irlix.booking.mapper;
 
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -16,7 +17,8 @@ import java.util.List;
  */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.ERROR,
-        uses = {BookingMapper.class, BreakageRequestMapper.class})
+        uses = {BookingMapper.class, BreakageRequestMapper.class},
+        builder = @Builder(disableBuilder = true))
 public interface UserMapper {
 
     @Mapping(target = "isDelete", source = "isDelete")

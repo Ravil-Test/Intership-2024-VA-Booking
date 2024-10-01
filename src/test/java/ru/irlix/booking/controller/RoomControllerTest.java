@@ -1,14 +1,20 @@
 package ru.irlix.booking.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.irlix.booking.dto.room.RoomCreateRequest;
 import ru.irlix.booking.dto.room.RoomUpdateRequest;
+import ru.irlix.booking.entity.Office;
+import ru.irlix.booking.entity.Room;
+import ru.irlix.booking.repository.OfficeRepository;
+import ru.irlix.booking.repository.RoomRepository;
 import ru.irlix.booking.util.BaseIntegrationTest;
 
 import java.util.UUID;
@@ -21,6 +27,37 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DisplayName(value = "Тесты контроллера помещений")
 class RoomControllerTest extends BaseIntegrationTest {
+
+    private Room testRoom;
+
+    private Office testOffice;
+
+    @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
+    private OfficeRepository officeRepository;
+
+    @BeforeEach
+    public void setUp() {
+        testOffice = Office.builder()
+                .address("123 Main St, Springfield")
+                .name("Head Office")
+                .isDelete(false)
+                .build();
+        Office savedOffice = officeRepository.save(testOffice);
+
+        testRoom = Room.builder()
+                .id(UUID.randomUUID())
+                .name("Small meeting room")
+                .floorNumber((short) 3)
+                .roomNumber((short) 15)
+                .isDelete(false)
+                .office(savedOffice)
+                .build();
+        Room savedRoom = roomRepository.save(testRoom);
+        testRoom.setId(savedRoom.getId());
+    }
 
     @Test
     @WithMockUser(authorities = "ROLE_USER")
@@ -39,11 +76,11 @@ class RoomControllerTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение помещения по id")
     void getByIdTest_success() throws Exception {
-        UUID id = UUID.fromString("44444444-4444-4444-4444-444444444444");
+        UUID id = testRoom.getId();
 
         mockMvc.perform(get("/rooms/{id}", id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Малый переговорный зал"))
+                .andExpect(jsonPath("$.name").value("Small meeting room"))
                 .andExpect(jsonPath("$.floorNumber").value(3))
                 .andExpect(jsonPath("$.roomNumber").value(15))
                 .andExpect(jsonPath("$.isDelete").value(false));
@@ -55,7 +92,7 @@ class RoomControllerTest extends BaseIntegrationTest {
     @DisplayName(value = "Тест на создание помещения")
     @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void createTest_success() throws Exception {
-        UUID officeId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        UUID officeId = testOffice.getId();
 
         RoomCreateRequest createRequest = new RoomCreateRequest("Create test name", (short) 14, (short) 15, officeId);
         String jsonCreateRequest = getMapper().writeValueAsString(createRequest);
@@ -76,8 +113,8 @@ class RoomControllerTest extends BaseIntegrationTest {
     @DisplayName(value = "Тест на обновление помещения")
     @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void updateTest_success() throws Exception {
-        UUID roomId = UUID.fromString("55555555-5555-5555-5555-555555555555");
-        UUID officeId = UUID.fromString("22222222-2222-2222-2222-222222222222");
+        UUID roomId = testRoom.getId();
+        UUID officeId = testOffice.getId();
 
         RoomUpdateRequest updateRequest = new RoomUpdateRequest("Update test name", (short) 14, (short) 15, officeId);
         String jsonUpdateRequest = getMapper().writeValueAsString(updateRequest);
@@ -97,7 +134,7 @@ class RoomControllerTest extends BaseIntegrationTest {
     @DisplayName(value = "Тест на удаление помещения")
     @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void deleteTest_success() throws Exception {
-        UUID id = UUID.fromString("66666666-6666-6666-6666-666666666666");
+        UUID id = testRoom.getId();
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/rooms/{id}", id))
                 .andExpect(status().isOk());

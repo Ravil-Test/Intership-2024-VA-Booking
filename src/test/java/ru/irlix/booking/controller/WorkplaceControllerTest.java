@@ -2,20 +2,26 @@ package ru.irlix.booking.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.irlix.booking.dto.workplace.WorkplaceCreateRequest;
 import ru.irlix.booking.dto.workplace.WorkplaceResponse;
 import ru.irlix.booking.dto.workplace.WorkplaceSearchRequest;
 import ru.irlix.booking.dto.workplace.WorkplaceUpdateRequest;
+import ru.irlix.booking.entity.Office;
+import ru.irlix.booking.entity.Room;
+import ru.irlix.booking.entity.Workplace;
+import ru.irlix.booking.repository.OfficeRepository;
+import ru.irlix.booking.repository.RoomRepository;
+import ru.irlix.booking.repository.WorkplaceRepository;
 import ru.irlix.booking.util.BaseIntegrationTest;
 
 import java.util.List;
@@ -29,11 +35,49 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DisplayName(value = "Тесты контроллера рабочих мест")
-@TestPropertySource("classpath:application-test.properties")
-@Sql({
-        "classpath:sql/init_data.sql"
-})
 class WorkplaceControllerTest extends BaseIntegrationTest {
+
+    private Room testRoom;
+
+    private Workplace testWorkplace;
+
+    @Autowired
+    private OfficeRepository officeRepository;
+
+    @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
+    private WorkplaceRepository workplaceRepository;
+
+    @BeforeEach
+    public void setUp() {
+        Office testOffice = Office.builder()
+                .address("123 Main St, Springfield")
+                .name("Head Office")
+                .isDelete(false)
+                .build();
+        Office savedOffice = officeRepository.save(testOffice);
+
+        testRoom = Room.builder()
+                .id(UUID.randomUUID())
+                .name("Small meeting room")
+                .floorNumber((short) 3)
+                .roomNumber((short) 15)
+                .isDelete(false)
+                .office(savedOffice)
+                .build();
+        Room savedRoom = roomRepository.save(testRoom);
+        testRoom.setId(savedRoom.getId());
+
+        testWorkplace = Workplace.builder()
+                .number(1)
+                .description("Workplace near window")
+                .isDelete(false)
+                .room(savedRoom)
+                .build();
+        workplaceRepository.save(testWorkplace);
+    }
 
     @Test
     @WithMockUser
@@ -52,7 +96,8 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение рабочего места по id")
     void getByIdTest_success() throws Exception {
-        UUID id = UUID.fromString("55555555-5555-5555-5555-555555555555");
+        UUID id = testWorkplace.getId();
+
         mockMvc.perform(get("/workplaces/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.number").value(1))
@@ -66,8 +111,8 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение рабочего места по id")
     void searchTest_success() throws Exception {
-        WorkplaceResponse expected = new WorkplaceResponse(2, "Workplace with desk", false);
-        String filter = getMapper().writeValueAsString(new WorkplaceSearchRequest(2, false, null));
+        WorkplaceResponse expected = new WorkplaceResponse(1, "Workplace near window", false);
+        String filter = getMapper().writeValueAsString(new WorkplaceSearchRequest(1, false, null));
 
         MvcResult mvcResult = mockMvc.perform(get("/workplaces/search")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -83,8 +128,6 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
         );
 
         Assertions.assertTrue(actualResponse.stream().anyMatch(content -> content.equals(expected)));
-
-
     }
 
     @Test
@@ -93,7 +136,7 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     @DisplayName(value = "Тест на создание рабочего места")
     @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void saveTest_success() throws Exception {
-        UUID roomId = UUID.fromString("33333333-3333-3333-3333-333333333333");
+        UUID roomId = testRoom.getId();
         WorkplaceCreateRequest createRequest = new WorkplaceCreateRequest(5, "Create test description", roomId);
         String jsonCreateRequest = getMapper().writeValueAsString(createRequest);
 
@@ -111,8 +154,8 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     @DisplayName(value = "Тест на обновление рабочего места")
     @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void updateTest_success() throws Exception {
-        UUID workplaceId = UUID.fromString("55555555-5555-5555-5555-555555555555");
-        UUID roomId = UUID.fromString("44444444-4444-4444-4444-444444444444");
+        UUID workplaceId = testWorkplace.getId();
+        UUID roomId = testRoom.getId();
 
         WorkplaceUpdateRequest updateRequest = new WorkplaceUpdateRequest(3, "Update test description", roomId);
         String jsonUpdateRequest = getMapper().writeValueAsString(updateRequest);
@@ -131,7 +174,7 @@ class WorkplaceControllerTest extends BaseIntegrationTest {
     @DisplayName(value = "Тест на удаление рабочего места")
     @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void deleteTest_success() throws Exception {
-        UUID id = UUID.fromString("55555555-5555-5555-5555-555555555555");
+        UUID id = testWorkplace.getId();
 
         mockMvc.perform(delete("/workplaces/{id}", id))
                 .andExpect(status().isOk());

@@ -1,5 +1,6 @@
 package ru.irlix.booking.mapper;
 
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -14,7 +15,10 @@ import java.util.List;
 /**
  * Маппер для помещения
  */
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.ERROR, uses = OfficeMapper.class)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        unmappedTargetPolicy = ReportingPolicy.ERROR,
+        uses = OfficeMapper.class,
+        builder = @Builder(disableBuilder = true))
 public interface RoomMapper {
 
     @Mapping(target = "isDelete", source = "delete")
