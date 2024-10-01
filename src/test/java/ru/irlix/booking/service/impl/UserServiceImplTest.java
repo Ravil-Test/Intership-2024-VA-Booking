@@ -1,19 +1,19 @@
 package ru.irlix.booking.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import ru.irlix.booking.dto.role.RoleResponse;
 import ru.irlix.booking.dto.user.UserCreateRequest;
 import ru.irlix.booking.dto.user.UserResponse;
 import ru.irlix.booking.dto.user.UserUpdateRequest;
 import ru.irlix.booking.entity.Role;
 import ru.irlix.booking.entity.User;
+import ru.irlix.booking.repository.RoleRepository;
 import ru.irlix.booking.repository.UserRepository;
 import ru.irlix.booking.service.RoleService;
 import ru.irlix.booking.service.UserService;
@@ -24,38 +24,85 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName(value = "Тесты безнес-логики пользователей")
-@TestPropertySource("classpath:application-test.properties")
-@Sql({
-        "classpath:sql/init_usersServiceImplTest.sql"
-})
 class UserServiceImplTest extends BaseIntegrationTest {
+
+    private User testUser;
 
     @Autowired
     private UserService userService;
 
     @Autowired
-    private UserRepository userRepository;
+    private RoleService roleService;
 
     @Autowired
-    private RoleService roleService;
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @BeforeEach
+    public void setUp() {
+        Role testRole = Role.builder()
+                .id(UUID.fromString("15151515-1515-1515-1515-151515151515"))
+                .name("USER")
+                .build();
+        Role savedRole = roleRepository.save(testRole);
+
+        testUser = User.builder()
+                .fio("Ignatiev Ignat Ignatievich")
+                .phoneNumber("88003000400")
+                .email("ignat@yandex.ru")
+                .roles(Set.of(savedRole))
+                .password(new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3'})
+                .availableMinutesForBooking(30)
+                .isDelete(false)
+                .build();
+        userRepository.save(testUser);
+
+        User testUser2 = User.builder()
+                .fio("Petrov Ignat Petrovich")
+                .phoneNumber("88004000500")
+                .email("petr@gmail.com")
+                .roles(Set.of(savedRole))
+                .password(new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3'})
+                .availableMinutesForBooking(20)
+                .isDelete(true)
+                .build();
+        userRepository.save(testUser2);
+
+        User testUser3 = User.builder()
+                .fio("Sidorov Sergey Ivanovich")
+                .phoneNumber("88005000600")
+                .email("sidr@gmail.com")
+                .roles(Set.of(savedRole))
+                .password(new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3'})
+                .availableMinutesForBooking(120)
+                .isDelete(false)
+                .build();
+        userRepository.save(testUser3);
+    }
 
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на получение пользователя по id")
     void getById_success() {
-        UUID id = UUID.fromString("21212121-2121-2121-2121-212121212121");
+        UUID id = testUser.getId();
 
         UserResponse actualResponse = userService.getById(id);
 
         assertNotNull(actualResponse);
-        assertEquals("Sidorov Ivan Ivanovich", actualResponse.fio());
-        assertEquals("88002000600", actualResponse.phoneNumber());
-        assertEquals("sidorov.dev@gmail.com", actualResponse.email());
-        assertEquals(120, actualResponse.availableMinutesForBooking());
+        assertEquals("Ignatiev Ignat Ignatievich", actualResponse.fio());
+        assertEquals("88003000400", actualResponse.phoneNumber());
+        assertEquals("ignat@yandex.ru", actualResponse.email());
+        assertEquals(30, actualResponse.availableMinutesForBooking());
         assertFalse(actualResponse.isDelete());
     }
 
@@ -76,12 +123,12 @@ class UserServiceImplTest extends BaseIntegrationTest {
         RoleResponse roleUser = new RoleResponse("USER");
 
         List<UserResponse> expectedResponseList = List.of(
-                new UserResponse("Sidorov Ivan Ivanovich", "88002000600",
-                        "sidorov.dev@gmail.com", 120, false, Set.of(roleUser)),
                 new UserResponse("Ignatiev Ignat Ignatievich", "88003000400",
                         "ignat@yandex.ru", 30, false, Set.of(roleUser)),
-                 new UserResponse("Petrov Ignat Petrovich", "82003000700",
-                         "petrov.dev@gmail.com", 20, true, Set.of(roleUser)));
+                new UserResponse("Petrov Ignat Petrovich", "88004000500",
+                        "petr@gmail.com", 20, true, Set.of(roleUser)),
+                new UserResponse("Sidorov Sergey Ivanovich", "88005000600",
+                        "sidr@gmail.com", 120, false, Set.of(roleUser)));
 
         List<UserResponse> actualResponseList = userService.getAll();
 
@@ -114,7 +161,7 @@ class UserServiceImplTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на обновление пользователя")
     void update_success() {
-        UUID userId = UUID.fromString("21212121-2121-2121-2121-212121212121");
+        UUID userId = testUser.getId();
         UserUpdateRequest updateRequest = new UserUpdateRequest("Petrova Marina Petrovna",
                 "79142480689", "petrova@rambler.ru", "password123".toCharArray());
 
@@ -143,7 +190,7 @@ class UserServiceImplTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на удаление пользователя")
     void delete_success() {
-        UUID userId = UUID.fromString("21212121-2121-2121-2121-212121212121");
+        UUID userId = testUser.getId();
         userService.delete(userId);
 
         Optional<User> deletedRoom = userRepository.findById(userId);

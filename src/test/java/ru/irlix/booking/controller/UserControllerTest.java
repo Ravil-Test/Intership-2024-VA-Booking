@@ -1,18 +1,23 @@
 package ru.irlix.booking.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.irlix.booking.dto.user.UserCreateRequest;
+import ru.irlix.booking.entity.Role;
+import ru.irlix.booking.entity.User;
+import ru.irlix.booking.repository.RoleRepository;
+import ru.irlix.booking.repository.UserRepository;
 import ru.irlix.booking.util.BaseIntegrationTest;
 
+import java.util.Set;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -25,11 +30,57 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @DisplayName(value = "Тесты контроллера пользователей")
-@TestPropertySource("classpath:application-test.properties")
-@Sql({
-        "classpath:sql/init_usersServiceImplTest.sql"
-})
 class UserControllerTest extends BaseIntegrationTest {
+
+    private User testUser;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @BeforeEach
+    public void setUp() {
+        Role testRole = Role.builder()
+                .id(UUID.fromString("15151515-1515-1515-1515-151515151515"))
+                .name("USER")
+                .build();
+        Role savedRole = roleRepository.save(testRole);
+
+        testUser = User.builder()
+                .fio("Ignatiev Ignat Ignatievich")
+                .phoneNumber("88003000400")
+                .email("ignat@yandex.ru")
+                .roles(Set.of(savedRole))
+                .password(new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3'})
+                .availableMinutesForBooking(120)
+                .isDelete(false)
+                .build();
+        userRepository.save(testUser);
+
+        User testUser2 = User.builder()
+                .fio("Petrov Ignat Petrovich")
+                .phoneNumber("88004000500")
+                .email("petr@yandex.ru")
+                .roles(Set.of(savedRole))
+                .password(new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3'})
+                .availableMinutesForBooking(120)
+                .isDelete(true)
+                .build();
+        userRepository.save(testUser2);
+
+        User testUser3 = User.builder()
+                .fio("Sidorov Sergey Ivanovich")
+                .phoneNumber("88005000600")
+                .email("sidr@yandex.ru")
+                .roles(Set.of(savedRole))
+                .password(new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3'})
+                .availableMinutesForBooking(120)
+                .isDelete(false)
+                .build();
+        userRepository.save(testUser3);
+    }
 
     @Test
     @WithMockUser(authorities = "ROLE_USER")
@@ -49,7 +100,7 @@ class UserControllerTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на получение пользователя по id")
     void getById() throws Exception {
-        UUID id = UUID.fromString("32323232-3232-3232-3232-323232323232");
+        UUID id = testUser.getId();
 
         mockMvc.perform(get("/users/{id}", id))
                 .andDo(print())
@@ -97,10 +148,10 @@ class UserControllerTest extends BaseIntegrationTest {
     void searchFioUnique_success() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/users/search")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"fio\": \"Ivan\", \"isDelete\": false}"))
+                        .content("{\"fio\": \"Ignat\", \"isDelete\": false}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.size()").value(1))
-                .andExpect(jsonPath("$.content.[0].fio").value("Sidorov Ivan Ivanovich"));
+                .andExpect(jsonPath("$.content.[0].fio").value("Ignatiev Ignat Ignatievich"));
 
     }
 
@@ -146,7 +197,7 @@ class UserControllerTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.size()").value(2))
                 .andExpect(jsonPath("$.content[0].fio").value("Ignatiev Ignat Ignatievich"))
-                .andExpect(jsonPath("$.content[1].fio").value("Sidorov Ivan Ivanovich"));
+                .andExpect(jsonPath("$.content[1].fio").value("Sidorov Sergey Ivanovich"));
     }
 
     @Test
@@ -155,7 +206,6 @@ class UserControllerTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на создание пользователя")
     void create() throws Exception {
-
         UserCreateRequest userCreateRequest = new UserCreateRequest(
                 "Александров Александ Александрович",
                 "77007000700",
@@ -182,8 +232,7 @@ class UserControllerTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на обновление пользователя")
     void update() throws Exception {
-
-        UUID id = UUID.fromString("21212121-2121-2121-2121-212121212121");
+        UUID id = testUser.getId();
 
         UserCreateRequest userCreateRequest = new UserCreateRequest(
                 "Васильев Василий Васильевич",
@@ -211,7 +260,7 @@ class UserControllerTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на удаление пользователя")
     void delete() throws Exception {
-        UUID id = UUID.fromString("21212121-2121-2121-2121-212121212121");
+        UUID id = testUser.getId();
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON))

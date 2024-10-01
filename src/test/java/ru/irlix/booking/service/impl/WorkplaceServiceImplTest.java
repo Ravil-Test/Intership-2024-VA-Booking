@@ -1,6 +1,7 @@
 package ru.irlix.booking.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -8,12 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import ru.irlix.booking.dto.workplace.WorkplaceCreateRequest;
 import ru.irlix.booking.dto.workplace.WorkplaceResponse;
 import ru.irlix.booking.dto.workplace.WorkplaceSearchRequest;
 import ru.irlix.booking.dto.workplace.WorkplaceUpdateRequest;
+import ru.irlix.booking.entity.Office;
+import ru.irlix.booking.entity.Room;
+import ru.irlix.booking.entity.Workplace;
+import ru.irlix.booking.repository.OfficeRepository;
+import ru.irlix.booking.repository.RoomRepository;
+import ru.irlix.booking.repository.WorkplaceRepository;
 import ru.irlix.booking.service.WorkplaceService;
 import ru.irlix.booking.util.BaseIntegrationTest;
 
@@ -27,21 +32,67 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName(value = "Тесты бизнес-логики рабочих мест")
-@TestPropertySource("classpath:application-test.properties")
-@Sql({
-        "classpath:sql/init_data.sql"
-})
 class WorkplaceServiceImplTest extends BaseIntegrationTest {
+
+    private Room testRoom;
+
+    private Workplace testWorkplace;
 
     @Autowired
     private WorkplaceService workplaceService;
+
+    @Autowired
+    private OfficeRepository officeRepository;
+
+    @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
+    private WorkplaceRepository workplaceRepository;
+
+    @BeforeEach
+    public void setUp() {
+        Office testOffice = Office.builder()
+                .address("123 Main St, Springfield")
+                .name("Head Office")
+                .isDelete(false)
+                .build();
+        Office savedOffice = officeRepository.save(testOffice);
+
+        testRoom = Room.builder()
+                .id(UUID.randomUUID())
+                .name("Small meeting room")
+                .floorNumber((short) 3)
+                .roomNumber((short) 15)
+                .isDelete(false)
+                .office(savedOffice)
+                .build();
+        Room savedRoom = roomRepository.save(testRoom);
+        testRoom.setId(savedRoom.getId());
+
+        testWorkplace = Workplace.builder()
+                .number(1)
+                .description("Workplace near window")
+                .isDelete(false)
+                .room(savedRoom)
+                .build();
+        workplaceRepository.save(testWorkplace);
+
+        Workplace testWorkplace2 = Workplace.builder()
+                .number(2)
+                .description("Workplace with desk")
+                .isDelete(false)
+                .room(savedRoom)
+                .build();
+        workplaceRepository.save(testWorkplace2);
+    }
 
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест получения рабочего места по id")
     void getById_success() {
-        UUID id = UUID.fromString("55555555-5555-5555-5555-555555555555");
+        UUID id = testWorkplace.getId();
 
         WorkplaceResponse foundWorkplace = workplaceService.getById(id);
 
@@ -99,7 +150,7 @@ class WorkplaceServiceImplTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест создания рабочего места")
     void saveTest_success() {
-        WorkplaceCreateRequest createRequest = new WorkplaceCreateRequest(5, "Test create", UUID.fromString("44444444-4444-4444-4444-444444444444"));
+        WorkplaceCreateRequest createRequest = new WorkplaceCreateRequest(5, "Test create", testRoom.getId());
         WorkplaceResponse expected = new WorkplaceResponse(5, "Test create", false);
 
         WorkplaceResponse createdWorkplace = workplaceService.save(createRequest);
@@ -113,7 +164,7 @@ class WorkplaceServiceImplTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест обновления рабочего места")
     void updateTest_success() {
-        UUID id = UUID.fromString("66666666-6666-6666-6666-666666666666");
+        UUID id = testWorkplace.getId();
         WorkplaceUpdateRequest update = new WorkplaceUpdateRequest(10, "Test update", null);
 
         WorkplaceResponse expected = new WorkplaceResponse(10, "Test update", false);
@@ -140,7 +191,7 @@ class WorkplaceServiceImplTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест удаления рабочего места по id")
     void delete_success() {
-        UUID id = UUID.fromString("66666666-6666-6666-6666-666666666666");
+        UUID id = testWorkplace.getId();
         workplaceService.delete(id);
 
         assertTrue(workplaceService.getById(id).isDelete());

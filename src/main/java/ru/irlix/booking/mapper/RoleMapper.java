@@ -1,5 +1,6 @@
 package ru.irlix.booking.mapper;
 
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -14,7 +15,9 @@ import java.util.List;
 /**
  * Маппер для роли
  */
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        unmappedTargetPolicy = ReportingPolicy.ERROR,
+        builder = @Builder(disableBuilder = true))
 public interface RoleMapper {
 
 

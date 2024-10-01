@@ -2,9 +2,11 @@ package ru.irlix.booking.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
@@ -13,6 +15,8 @@ import ru.irlix.booking.dto.office.OfficeCreateRequest;
 import ru.irlix.booking.dto.office.OfficeResponse;
 import ru.irlix.booking.dto.office.OfficeSearchRequest;
 import ru.irlix.booking.dto.office.OfficeUpdateRequest;
+import ru.irlix.booking.entity.Office;
+import ru.irlix.booking.repository.OfficeRepository;
 import ru.irlix.booking.util.BaseIntegrationTest;
 
 import java.util.List;
@@ -27,6 +31,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DisplayName(value = "Тесты контроллера офисов")
 class OfficeControllerTest extends BaseIntegrationTest {
+
+    @Autowired
+    private OfficeRepository officeRepository;
+
+    private Office testOffice;
+
+    @BeforeEach
+    public void setUp() {
+        testOffice = Office.builder()
+                .address("123 Main St, Springfield")
+                .name("Head Office")
+                .isDelete(false)
+                .build();
+        officeRepository.save(testOffice);
+    }
 
     @Test
     @WithMockUser
@@ -70,7 +89,7 @@ class OfficeControllerTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение офиса на id")
     void getOfficeByIdTest_success() throws Exception {
-        UUID id = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        UUID id = testOffice.getId();
 
         mockMvc.perform(get("/offices/{id}", id))
                 .andExpect(status().isOk())
@@ -103,7 +122,7 @@ class OfficeControllerTest extends BaseIntegrationTest {
     @DisplayName(value = "Тест на обновление офиса")
     @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void updateOfficeTest_success() throws Exception {
-        UUID id = UUID.fromString("33333333-3333-3333-3333-333333333333");
+        UUID id = testOffice.getId();
 
         OfficeUpdateRequest updateRequest = new OfficeUpdateRequest("Update test address", "Update test name");
         String jsonUpdateRequest = getMapper().writeValueAsString(updateRequest);
@@ -138,7 +157,7 @@ class OfficeControllerTest extends BaseIntegrationTest {
     @DisplayName(value = "Тест на удаление офиса")
     @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void deleteOfficeTest_success() throws Exception {
-        UUID id = UUID.fromString("22222222-2222-2222-2222-222222222222");
+        UUID id = testOffice.getId();
 
         mockMvc.perform(delete("/offices/{id}", id))
                 .andExpect(status().isOk());

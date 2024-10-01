@@ -2,6 +2,7 @@ package ru.irlix.booking.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -10,13 +11,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import ru.irlix.booking.dto.room.RoomCreateRequest;
 import ru.irlix.booking.dto.room.RoomResponse;
 import ru.irlix.booking.dto.room.RoomSearchRequest;
 import ru.irlix.booking.dto.room.RoomUpdateRequest;
+import ru.irlix.booking.entity.Office;
 import ru.irlix.booking.entity.Room;
+import ru.irlix.booking.repository.OfficeRepository;
 import ru.irlix.booking.repository.RoomRepository;
 import ru.irlix.booking.service.RoomService;
 import ru.irlix.booking.util.BaseIntegrationTest;
@@ -31,12 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName(value = "Тесты безнес-логики помещений")
-@TestPropertySource("classpath:application-test.properties")
-@Sql({
-        "classpath:sql/init_data.sql"
-})
+@DisplayName(value = "Тесты бизнес-логики помещений")
 class RoomServiceImplTest extends BaseIntegrationTest {
+
+    private Room testRoom;
+
+    private Office testOffice;
 
     @Autowired
     private RoomService roomService;
@@ -44,12 +45,56 @@ class RoomServiceImplTest extends BaseIntegrationTest {
     @Autowired
     private RoomRepository roomRepository;
 
+    @Autowired
+    private OfficeRepository officeRepository;
+
+    @BeforeEach
+    public void setUp() {
+        testOffice = Office.builder()
+                .address("123 Main St, Springfield")
+                .name("Head Office")
+                .isDelete(false)
+                .build();
+        Office savedOffice = officeRepository.save(testOffice);
+
+        testRoom = Room.builder()
+                .id(UUID.randomUUID())
+                .name("Small meeting room")
+                .floorNumber((short) 3)
+                .roomNumber((short) 15)
+                .isDelete(false)
+                .office(savedOffice)
+                .build();
+        Room savedRoom = roomRepository.save(testRoom);
+        testRoom.setId(savedRoom.getId());
+
+        Room testRoom2 = Room.builder()
+                .id(UUID.randomUUID())
+                .name("Large conference room")
+                .floorNumber((short) 2)
+                .roomNumber((short) 10)
+                .isDelete(false)
+                .office(savedOffice)
+                .build();
+        roomRepository.save(testRoom2);
+
+        Room testRoom3 = Room.builder()
+                .id(UUID.randomUUID())
+                .name("Кабинет для backend разработки")
+                .floorNumber((short) 1)
+                .roomNumber((short) 4)
+                .isDelete(false)
+                .office(savedOffice)
+                .build();
+        roomRepository.save(testRoom3);
+    }
+
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получения помещения по id")
     void getByIdTest_success() {
-        UUID id = UUID.fromString("33333333-3333-3333-3333-333333333333");
+        UUID id = testRoom.getId();
 
         RoomResponse actualResponse = roomService.getById(id);
 
@@ -76,13 +121,15 @@ class RoomServiceImplTest extends BaseIntegrationTest {
     void getAllTest_success() {
         List<RoomResponse> expectedResponseList = List.of(
                 new RoomResponse("Small meeting room", (short) 3, (short) 15, false),
-                new RoomResponse("Large conference room", (short) 2, (short) 10, false));
+                new RoomResponse("Large conference room", (short) 2, (short) 10, false),
+                new RoomResponse("Кабинет для backend разработки", (short) 1, (short) 4, false));
         List<RoomResponse> actualResponseList = roomService.getAll();
 
         assertEquals(expectedResponseList.size(), actualResponseList.size());
         assertFalse(actualResponseList.isEmpty());
         assertTrue(actualResponseList.stream().anyMatch(actualResponse -> actualResponse.equals(expectedResponseList.get(0))));
         assertTrue(actualResponseList.stream().anyMatch(actualResponse -> actualResponse.equals(expectedResponseList.get(1))));
+        assertTrue(actualResponseList.stream().anyMatch(actualResponse -> actualResponse.equals(expectedResponseList.get(2))));
     }
 
     @Test
@@ -139,7 +186,7 @@ class RoomServiceImplTest extends BaseIntegrationTest {
     @DisplayName(value = "Тест на создание помещения")
     void saveRoomTest_success() {
         RoomCreateRequest createRequest = new RoomCreateRequest("Room A", (short) 2, (short) 202,
-                UUID.fromString("11111111-1111-1111-1111-111111111111"));
+                testOffice.getId());
 
         RoomResponse savedRoom = roomService.save(createRequest);
 
@@ -153,7 +200,7 @@ class RoomServiceImplTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на обновление помещения")
     void updateTest_success() {
-        UUID roomId = UUID.fromString("44444444-4444-4444-4444-444444444444");
+        UUID roomId = testRoom.getId();
         RoomUpdateRequest updateRequest = new RoomUpdateRequest("Update room", (short) 2, (short) 202,
                 null);
 
@@ -183,7 +230,7 @@ class RoomServiceImplTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на удаление помещения")
     void deleteRoomTest_success() {
-        UUID id = UUID.fromString("44444444-4444-4444-4444-444444444444");
+        UUID id = testRoom.getId();
         roomService.delete(id);
 
         Optional<Room> deletedRoom = roomRepository.findById(id);
