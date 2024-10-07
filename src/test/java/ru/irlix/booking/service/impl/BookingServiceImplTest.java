@@ -10,6 +10,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.irlix.booking.dto.booking.BookingCancelRequest;
 import ru.irlix.booking.dto.booking.BookingCreateRequest;
 import ru.irlix.booking.dto.booking.BookingResponse;
+import ru.irlix.booking.dto.user.UserBookingResponse;
 import ru.irlix.booking.entity.Booking;
 import ru.irlix.booking.entity.Office;
 import ru.irlix.booking.entity.Room;
@@ -92,7 +93,7 @@ class BookingServiceImplTest extends BaseIntegrationTest {
                 .fio("Sidorov Ivan Ivanovich")
                 .phoneNumber("88002000600")
                 .email("sidorov.dev@gmail.com")
-                .password(new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3'})
+                .password("password123".toCharArray())
                 .availableMinutesForBooking(120)
                 .isDelete(false)
                 .build();
@@ -116,13 +117,16 @@ class BookingServiceImplTest extends BaseIntegrationTest {
     @Tag(value = "Позитивный")
     @DisplayName(value = "Тест на получение списка бронирований")
     void getBookingAllTest_success() {
+        UserBookingResponse userBookingResponse = new UserBookingResponse("Sidorov Ivan Ivanovich",
+                "88002000600", "sidorov.dev@gmail.com");
+
         List<BookingResponse> ResponseList = List.of(
                 new BookingResponse(LocalDateTime.now().withNano(0),
                         LocalDateTime.now().withNano(0),
                         LocalDateTime.now().withNano(0),
                         LocalDateTime.now().withNano(0),
                         "",
-                        false));
+                        false, userBookingResponse));
 
         List<BookingResponse> currentResponseList = bookingService.getAll();
 
@@ -167,8 +171,8 @@ class BookingServiceImplTest extends BaseIntegrationTest {
         UUID workplaceId = testWorkplace.getId();
 
         BookingCreateRequest createRequest = new BookingCreateRequest(
-                LocalDateTime.now().withSecond(0).withNano(0),
-                LocalDateTime.now().withSecond(0).withNano(0),
+                LocalDateTime.now().plusHours(1).withSecond(0).withNano(0),
+                LocalDateTime.now().plusHours(2).withSecond(0).withNano(0),
                 userId,
                 workplaceId);
 

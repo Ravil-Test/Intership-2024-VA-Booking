@@ -21,6 +21,7 @@ import ru.irlix.booking.service.UserService;
 import ru.irlix.booking.service.WorkplaceService;
 import ru.irlix.booking.specification.BookingSpecifications;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,11 +37,13 @@ public class BookingServiceImpl implements BookingService {
     private final WorkplaceService workplaceService;
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingResponse> getAll() {
         return bookingMapper.entityListToResponseList(bookingRepository.findAll());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookingResponse getById(UUID id) {
         Booking foundBooking = getBookingById(id);
         log.info("Get booking with id: {} : {}", id, foundBooking);
@@ -49,10 +52,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponse save(@NonNull BookingCreateRequest createRequest) {
-        Booking booking = bookingMapper.createRequestToEntity(createRequest);
+        checkStartBeforeEnd(createRequest);
+        checkStartBeforeNow(createRequest);
+        checkWorkplaceAvailability(createRequest, bookingRepository);
 
-        booking.setUser(userService.getUserById(createRequest.userID()));
-        booking.setWorkplace(workplaceService.getWorkplaceById(createRequest.workplaceID()));
+        Booking booking = bookingMapper.createRequestToEntity(createRequest);
+        booking.setUser(userService.getUserById(createRequest.userId()));
+        booking.setWorkplace(workplaceService.getWorkplaceById(createRequest.workplaceId()));
 
         Booking savedBooking = bookingRepository.save(booking);
         log.info("Created booking : {}", savedBooking);
@@ -61,6 +67,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookingResponse cancel(UUID id, @NonNull BookingCancelRequest updateRequest) {
         Booking currentBooking = getBookingById(id);
         Booking updateForBooking = bookingMapper.cancelRequestToEntity(updateRequest);
@@ -105,5 +112,44 @@ public class BookingServiceImpl implements BookingService {
     public Booking getBookingById(UUID id) {
         return bookingRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Booking with id " + id + " not found"));
+    }
+
+
+    /**
+     * Проверка времени начала бронирования
+     *
+     * @param createRequest - Запрос для бронирования рабочего места
+     */
+    private void checkStartBeforeEnd(BookingCreateRequest createRequest) {
+        log.debug("Проверка правильности заполнения периода (Время начала, меньше времени окончания");
+        if (!createRequest.bookingStartDateTime().isBefore(createRequest.bookingEndDateTime())) {
+            throw new IllegalArgumentException("Время начала бронирования должно быть раньше времени окончания");
+        }
+    }
+
+    /**
+     * Проверка времени начала бронирования
+     *
+     * @param createRequest - Запрос для бронирования рабочего места
+     */
+    private void checkStartBeforeNow(BookingCreateRequest createRequest) {
+        log.debug("Проверка правильности заполнения периода (Время должно быть в будущем");
+        if (createRequest.bookingStartDateTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Время бронирования должно быть в будущем");
+        }
+    }
+
+    /**
+     * Проверка доступности рабочего места на заданный период
+     *
+     * @param createRequest - Запрос для бронирования рабочего места
+     */
+    private void checkWorkplaceAvailability(BookingCreateRequest createRequest, BookingRepository bookingRepository) {
+        if (bookingRepository.checkAvailabilityWorkplace(
+                createRequest.workplaceId(),
+                createRequest.bookingStartDateTime(),
+                createRequest.bookingEndDateTime())) {
+            throw new IllegalArgumentException("Рабочее место уже забронировано на это время");
+        }
     }
 }

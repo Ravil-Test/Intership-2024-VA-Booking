@@ -25,6 +25,7 @@ import ru.irlix.booking.util.BaseIntegrationTest;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -59,6 +60,7 @@ class BookingControllerTest extends BaseIntegrationTest {
 
     @BeforeEach
     public void setUp() {
+
         Office office = Office.builder()
                 .address("123 Main St, Springfield")
                 .name("Head Office")
@@ -88,7 +90,7 @@ class BookingControllerTest extends BaseIntegrationTest {
                 .fio("Sidorov Ivan Ivanovich")
                 .phoneNumber("88002000600")
                 .email("sidorov.dev@gmail.com")
-                .password(new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3'})
+                .password("password123".toCharArray())
                 .availableMinutesForBooking(120)
                 .isDelete(false)
                 .build();
@@ -168,8 +170,8 @@ class BookingControllerTest extends BaseIntegrationTest {
         UUID workplaceId = testWorkplace.getId();
 
         BookingCreateRequest bookingCreateRequest = new BookingCreateRequest(
-                LocalDateTime.now().withNano(0),
-                LocalDateTime.now().withNano(0),
+                LocalDateTime.now().plusHours(1).withNano(0),
+                LocalDateTime.now().plusHours(2).withNano(0),
                 userId,
                 workplaceId
         );
@@ -182,9 +184,92 @@ class BookingControllerTest extends BaseIntegrationTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.bookingStartDateTime")
-                        .value(LocalDateTime.now().withNano(0).toString()))
+                        .value(LocalDateTime.now().plusHours(1).withNano(0).toString()))
                 .andExpect(jsonPath("$.bookingEndDateTime")
-                        .value(LocalDateTime.now().withNano(0).toString()));
+                        .value(LocalDateTime.now().plusHours(2).withNano(0).toString()));
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Негативный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
+    @DisplayName(value = "Негативный тест бронирования прошедшего времени")
+    void createBookingTestFailData_failure() throws Exception {
+        UUID userId = testUser.getId();
+        UUID workplaceId = testWorkplace.getId();
+
+        BookingCreateRequest bookingCreateRequest = new BookingCreateRequest(
+                LocalDateTime.now().minusHours(2).withNano(0),
+                LocalDateTime.now().minusHours(1).withNano(0),
+                userId,
+                workplaceId
+        );
+
+        String jsonCreateRequest = getMapper().writeValueAsString(bookingCreateRequest);
+
+        mockMvc.perform(post("/bookings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonCreateRequest))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Негативный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
+    @DisplayName(value = "Негативный тест бронирования с некорректным временем")
+    void createBookingTestFailStartTimeData_failure() throws Exception {
+        UUID userId = testUser.getId();
+        UUID workplaceId = testWorkplace.getId();
+
+        BookingCreateRequest bookingCreateRequest = new BookingCreateRequest(
+                LocalDateTime.now().plusHours(2).withNano(0),
+                LocalDateTime.now().plusHours(1).withNano(0),
+                userId,
+                workplaceId
+        );
+
+        String jsonCreateRequest = getMapper().writeValueAsString(bookingCreateRequest);
+
+        mockMvc.perform(post("/bookings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonCreateRequest))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Негативный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
+    @DisplayName(value = "Негативный тест при бронировании занятого рабочего места")
+    void createBookingTestBusyWorkplace_failure() throws Exception {
+        UUID userId = testUser.getId();
+        UUID workplaceId = testWorkplace.getId();
+
+        bookingRepository.save(new Booking(UUID.randomUUID(), LocalDateTime.now(),
+                LocalDateTime.now().plusHours(1).withNano(0),
+                LocalDateTime.now().plusHours(2).withNano(0), null, null, false,
+                workplaceRepository.findById(workplaceId).orElse(null),
+                userRepository.findById(userId).orElse(null)
+
+        ));
+
+        BookingCreateRequest bookingCreateRequest = new BookingCreateRequest(
+                LocalDateTime.now().plusHours(1).withNano(0),
+                LocalDateTime.now().plusHours(2).withNano(0),
+                userId,
+                workplaceId
+        );
+
+        String jsonCreateRequest = getMapper().writeValueAsString(bookingCreateRequest);
+
+        mockMvc.perform(post("/bookings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonCreateRequest))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -244,5 +329,19 @@ class BookingControllerTest extends BaseIntegrationTest {
 
         mockMvc.perform(get("/bookings/{id}", id))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Позитивный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
+    @DisplayName(value = "Позитивный тест на получение актуального времени")
+    void testFixTime_success() throws InterruptedException {
+        LocalDateTime expected = LocalDateTime.now();
+
+        Thread.sleep(5000);
+
+        LocalDateTime actual = LocalDateTime.now();
+        assertEquals(expected, actual);
     }
 }
