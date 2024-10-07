@@ -14,9 +14,11 @@ import ru.irlix.booking.dto.booking.BookingCreateRequest;
 import ru.irlix.booking.dto.booking.BookingResponse;
 import ru.irlix.booking.dto.booking.BookingSearchRequest;
 import ru.irlix.booking.entity.Booking;
+import ru.irlix.booking.entity.User;
 import ru.irlix.booking.mapper.BookingMapper;
 import ru.irlix.booking.repository.BookingRepository;
 import ru.irlix.booking.service.BookingService;
+import ru.irlix.booking.service.EmailSenderService;
 import ru.irlix.booking.service.UserService;
 import ru.irlix.booking.service.WorkplaceService;
 import ru.irlix.booking.specification.BookingSpecifications;
@@ -35,6 +37,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserService userService;
     private final WorkplaceService workplaceService;
+    private final EmailSenderService emailSenderService;
 
     @Override
     @Transactional(readOnly = true)
@@ -62,6 +65,9 @@ public class BookingServiceImpl implements BookingService {
 
         Booking savedBooking = bookingRepository.save(booking);
         log.info("Created booking : {}", savedBooking);
+
+        User user = userService.getUserById(createRequest.userId());
+        sendEmailAfterBooking(user.getEmail(), savedBooking);
 
         return bookingMapper.entityToResponse(savedBooking);
     }
@@ -151,5 +157,11 @@ public class BookingServiceImpl implements BookingService {
                 createRequest.bookingEndDateTime())) {
             throw new IllegalArgumentException("Рабочее место уже забронировано на это время");
         }
+    }
+
+    public void sendEmailAfterBooking(String email, Booking booking) {
+        String subject = "Booking created";
+        String body = "Your booking has been created for " + booking.getBookingDateTime().toString();
+        emailSenderService.sendEmail(email, subject, body);
     }
 }

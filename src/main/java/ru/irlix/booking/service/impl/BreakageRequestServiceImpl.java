@@ -14,11 +14,16 @@ import ru.irlix.booking.dto.breakagerequest.BreakageRequestUpdate;
 import ru.irlix.booking.dto.breakagerequest.BreakageResponse;
 import ru.irlix.booking.dto.breakagerequest.BreakageSearchRequest;
 import ru.irlix.booking.entity.BreakageRequest;
+import ru.irlix.booking.entity.User;
 import ru.irlix.booking.mapper.BreakageRequestMapper;
 import ru.irlix.booking.repository.BreakageRequestRepository;
 import ru.irlix.booking.service.BreakageRequestService;
+import ru.irlix.booking.service.EmailSenderService;
+import ru.irlix.booking.service.UserService;
+import ru.irlix.booking.service.WorkplaceService;
 import ru.irlix.booking.specification.BreakageSpecification;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,6 +35,9 @@ public class BreakageRequestServiceImpl implements BreakageRequestService {
 
     private final BreakageRequestRepository breakageRequestRepository;
     private final BreakageRequestMapper breakageRequestMapper;
+    private final EmailSenderService emailSenderService;
+    private final UserService userService;
+    private final WorkplaceService workplaceService;
 
     @Override
     @Transactional(readOnly = true)
@@ -81,11 +89,15 @@ public class BreakageRequestServiceImpl implements BreakageRequestService {
 
     @Override
     public BreakageResponse save(@NonNull BreakageRequestCreate createBreakageRequest) {
-
         BreakageRequest createdBreakageRequest = breakageRequestMapper.createRequestToEntity(createBreakageRequest);
+        createdBreakageRequest.setUser(userService.getUserById(createBreakageRequest.user()));
+        createdBreakageRequest.setWorkplace(workplaceService.getWorkplaceById(createBreakageRequest.workplace()));
 
         BreakageRequest savedBreakageRequest = breakageRequestRepository.save(createdBreakageRequest);
         log.info("Created breakage request {}", savedBreakageRequest);
+
+        User user = userService.getUserById(createBreakageRequest.user());
+        sendEmailAfterBooking(user.getEmail());
 
         return breakageRequestMapper.entityToResponse(savedBreakageRequest);
     }
@@ -119,5 +131,11 @@ public class BreakageRequestServiceImpl implements BreakageRequestService {
     private BreakageRequest getBreakageRequestById(UUID id) {
         return breakageRequestRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Breakage request with id " + id + " not found"));
+    }
+
+    public void sendEmailAfterBooking(String email) {
+        String subject = "Breakage request created";
+        String body = "Your Breakage request has been created for " + LocalDateTime.now().withNano(0);
+        emailSenderService.sendEmail(email, subject, body);
     }
 }
