@@ -21,8 +21,8 @@ import java.util.List;
         builder = @Builder(disableBuilder = true))
 public interface BreakageRequestMapper {
 
-    @Mapping(target = "isComplete", ignore = true)
-    @Mapping(target = "isCanceled", ignore = true)
+    @Mapping(target = "isComplete", source = "complete")
+    @Mapping(target = "isCanceled", source = "canceled")
     BreakageResponse entityToResponse(BreakageRequest breakageRequest);
 
     @Mapping(target = "id", ignore = true)

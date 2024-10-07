@@ -20,12 +20,8 @@ public record BreakageRequestCreate(
         String description,
 
         @Schema(title = "Информация о рабочем месте", example = "99999999-9999-9999-9999-999999999999")
-        @JsonProperty(value = "workplace_id")
+        @JsonProperty(value = "workplaceId")
         @NotNull(message = "Не может быть null")
-        UUID workplace,
-
-        @Schema(title = "Информация о пользователе", example = "12121212-1212-1212-1212-121212121212")
-        @JsonProperty(value = "user_id")
-        @NotNull(message = "Не может быть null")
-        UUID user) {
+        UUID workplaceId
+) {
 }

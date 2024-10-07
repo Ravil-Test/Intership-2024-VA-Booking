@@ -35,7 +35,7 @@ public interface BreakageRequestService {
     /**
      * Фильтр для поиска заявок о поломке
      *
-     * @param pageable - пагинация
+     * @param pageable        - пагинация
      * @param breakageRequest - ДТО заявки для поиска
      * @return - список пользователей
      */

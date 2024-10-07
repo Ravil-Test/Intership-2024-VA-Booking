@@ -42,7 +42,7 @@ public class BreakageRequestController {
     private final BreakageRequestService breakageRequestService;
 
     @GetMapping
-    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Получить список заявок о поломках",
             description = "Возвращает статус 200 и список заявок о поломках")
     public List<BreakageResponse> getAll() {
@@ -58,6 +58,7 @@ public class BreakageRequestController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Получить список заявок о поломке оборудования",
             description = "Возвращает статус 200 и список заявок")
     @ApiResponses(value = {
@@ -84,7 +85,7 @@ public class BreakageRequestController {
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize(value = "hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize(value = "hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Обновить заявку о поломке",
             description = "Возвращает статус 200 и обновленную заявку о поломке")
     public BreakageResponse update(@PathVariable UUID id,

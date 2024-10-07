@@ -30,7 +30,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"id", "phoneNumber", "email", "password"})
+@ToString(exclude = {"id", "phoneNumber", "email", "password", "roles", "bookings", "breakageRequests"})
 @Entity
 @Table(name = "\"user\"")
 @Builder

@@ -1,5 +1,7 @@
 package ru.irlix.booking.specification;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import ru.irlix.booking.entity.BreakageRequest;
 
@@ -9,6 +11,7 @@ import java.util.UUID;
 /**
  * Фильтр заявок о поломке
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BreakageSpecification {
 
     public static Specification<BreakageRequest> hasRequestDateTime(LocalDateTime requestDateTime) {

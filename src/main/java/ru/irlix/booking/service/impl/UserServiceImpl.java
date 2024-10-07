@@ -168,5 +168,4 @@ public class UserServiceImpl implements UserService {
         return userRepository.getUserByEmail(email).orElseThrow(()
                 -> new EntityNotFoundException("User with email: " + email + " not found"));
     }
-
 }

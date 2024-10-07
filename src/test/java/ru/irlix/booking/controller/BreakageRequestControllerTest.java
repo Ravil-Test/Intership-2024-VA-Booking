@@ -9,18 +9,22 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.irlix.booking.dto.breakagerequest.BreakageRequestCreate;
+import ru.irlix.booking.entity.Booking;
 import ru.irlix.booking.entity.BreakageRequest;
 import ru.irlix.booking.entity.Office;
 import ru.irlix.booking.entity.Role;
 import ru.irlix.booking.entity.Room;
 import ru.irlix.booking.entity.User;
 import ru.irlix.booking.entity.Workplace;
+import ru.irlix.booking.repository.BookingRepository;
 import ru.irlix.booking.repository.BreakageRequestRepository;
 import ru.irlix.booking.repository.OfficeRepository;
 import ru.irlix.booking.repository.RoleRepository;
 import ru.irlix.booking.repository.RoomRepository;
 import ru.irlix.booking.repository.UserRepository;
 import ru.irlix.booking.repository.WorkplaceRepository;
+import ru.irlix.booking.security.config.PasswordEncoder;
 import ru.irlix.booking.util.BaseIntegrationTest;
 
 import java.time.LocalDateTime;
@@ -28,7 +32,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,6 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BreakageRequestControllerTest extends BaseIntegrationTest {
 
     private BreakageRequest testBreakageRequest;
+    private Workplace testWorkplace;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -55,6 +63,12 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
 
     @Autowired
     private BreakageRequestRepository breakageRequestRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private BookingRepository bookingRepository;
 
     @BeforeEach
     public void setUp() {
@@ -76,7 +90,7 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
         Room savedRoom = roomRepository.save(testRoom);
         testRoom.setId(savedRoom.getId());
 
-        Workplace testWorkplace = Workplace.builder()
+        testWorkplace = Workplace.builder()
                 .number(1)
                 .description("Workplace near window")
                 .isDelete(false)
@@ -84,22 +98,51 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
                 .build();
         workplaceRepository.save(testWorkplace);
 
-        Role testRole = Role.builder()
+        Role testUserRole = Role.builder()
                 .id(UUID.fromString("15151515-1515-1515-1515-151515151515"))
                 .name("USER")
                 .build();
-        Role savedRole = roleRepository.save(testRole);
+        Role savedRoleUser = roleRepository.save(testUserRole);
+
+        Role testAdminRole = Role.builder()
+                .id(UUID.fromString("14141414-1414-1414-1414-141414141414"))
+                .name("ADMIN")
+                .build();
+        Role savedRoleAdmin = roleRepository.save(testAdminRole);
 
         User testUser = User.builder()
                 .fio("Ignatiev Ignat Ignatievich")
                 .phoneNumber("88003000400")
                 .email("ignat@yandex.ru")
-                .roles(Set.of(savedRole))
+                .roles(Set.of(savedRoleUser))
                 .password(new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3'})
                 .availableMinutesForBooking(120)
                 .isDelete(false)
                 .build();
         userRepository.save(testUser);
+
+        User testAdmin = User.builder()
+                .fio("Admin Admin Admin")
+                .phoneNumber("+78002000600")
+                .email("test.dev@gmail.com")
+                .roles(Set.of(savedRoleAdmin))
+                .password(passwordEncoder.passwordEncoder().encode("password123").toCharArray())
+                .availableMinutesForBooking(120)
+                .isDelete(false)
+                .build();
+        userRepository.save(testAdmin);
+
+        Booking testBookingAdmin = Booking.builder()
+                .bookingDateTime(LocalDateTime.now())
+                .bookingStartDateTime(LocalDateTime.now())
+                .bookingEndDateTime(LocalDateTime.now().plusHours(1))
+                .bookingCancelDateTime(null)
+                .cancelReason(null)
+                .isBooked(true)
+                .workplace(testWorkplace)
+                .user(testAdmin)
+                .build();
+        bookingRepository.save(testBookingAdmin);
 
         testBreakageRequest = BreakageRequest.builder()
                 .requestDateTime(LocalDateTime.now().withNano(0))
@@ -135,8 +178,8 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
-    @DisplayName(value = "Позитивный тест на получение списка заявок")
-    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
+    @DisplayName(value = "Позитивный тест на получение списка заявок для пользователя")
+    @WithMockUser(value = "ignat@yandex.ru")
     void getAll() throws Exception {
         mockMvc.perform(get("/breakages"))
                 .andDo(print())
@@ -150,7 +193,6 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
     @DisplayName(value = "Позитивный тест на получение заявки по id")
     @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     void getById() throws Exception {
-//        UUID id = UUID.fromString("00000000-0000-0000-0000-132435461234");
         UUID id = testBreakageRequest.getId();
 
         mockMvc.perform(get("/breakages/{id}", id))
@@ -165,6 +207,7 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DisplayName(value = "Позитивный тест с корректными параметрами, проверяющий пагинацию")
     void getAllPagination_success() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/breakages/search")
@@ -179,6 +222,7 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Негативный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DisplayName(value = "Негативный тест с некорректными параметрами, проверяющий пагинацию")
     void getAllPagination_notFound() throws Exception {
 
@@ -193,6 +237,7 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DisplayName("Позитивный тест поиска заявок по описанию")
     void searchDescription_success() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/breakages/search")
@@ -208,6 +253,7 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Негативный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DisplayName("Негативный тест поиск заявки по названию")
     void search_notFound() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/breakages/search")
@@ -220,6 +266,7 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DisplayName("Позитивный тест поиска заявок по статусу выполнения")
     void searchCompleted_success() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/breakages/search")
@@ -233,6 +280,7 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DisplayName("Позитивный тест поиска заявок по рабочему месту")
     void searchWorkplace_success() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/breakages/search")
@@ -248,6 +296,7 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Негативный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DisplayName("Негативный тест поиска заявок по рабочему месту")
     void searchWorkplace_notFound() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/breakages/search")
@@ -261,6 +310,7 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DisplayName("Позитивный тест поиска заявок по имени пользователя")
     void searchUser_success() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/breakages/search")
@@ -276,6 +326,7 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Негативный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
     @DisplayName("Негативный тест поиска заявок по имени пользователя")
     void searchUser_notFound() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/breakages/search")
@@ -288,14 +339,86 @@ class BreakageRequestControllerTest extends BaseIntegrationTest {
 
     @Test
     @DirtiesContext
-    @Tag(value = "Негативный")
-    @DisplayName(value = "Негативный тест на создание заявки о поломке")
-    void save_notFound() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/breakages")
+    @Tag(value = "Позитивный")
+    @WithMockUser(username = "test.dev@gmail.com", authorities = "ROLE_ADMIN")
+    @DisplayName(value = "Позитивный тест на создание заявки о поломке")
+    void save_success() throws Exception {
+        UUID workplaceId = testWorkplace.getId();
+        String body = getMapper().writeValueAsString(new BreakageRequestCreate("Create test", workplaceId));
+
+        mockMvc.perform(post("/breakages")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"description\": \"null\", "
-                                + "\"workplace_id\": \"null\", "
-                                + "\"user_id\": \"null\"}"))
+                        .content(body))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.description").value("Create test"));
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Негативный")
+    @WithMockUser(username = "test.dev@gmail.com", authorities = "ROLE_ADMIN")
+    @DisplayName(value = "Негативный тест на создание заявки о поломке")
+    void save_failed() throws Exception {
+        String body = getMapper().writeValueAsString(new BreakageRequestCreate("Create test", UUID.randomUUID()));
+
+        mockMvc.perform(post("/breakages")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Позитивный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
+    @DisplayName(value = "Позитивный тест на обновление заявки о поломке")
+    void update_success() throws Exception {
+        UUID id = testBreakageRequest.getId();
+
+        mockMvc.perform(patch("/breakages/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"description\": \"test\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description").value("test"));
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Негативный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
+    @DisplayName(value = "Негативный тест на обновление заявки о поломке")
+    void update_failed() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        mockMvc.perform(patch("/breakages/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"description\": \"test\"}"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Позитивный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
+    @DisplayName(value = "Позитивный тест на удаление заявки о поломке")
+    void delete_success() throws Exception {
+        UUID id = testBreakageRequest.getId();
+        mockMvc.perform(delete("/breakages/{id}", id))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/breakages/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isCanceled").value(true));
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Негативный")
+    @WithMockUser(value = "admin", authorities = "ROLE_ADMIN")
+    @DisplayName(value = "Негативный тест на удаление заявки о поломке")
+    void delete_failed() throws Exception {
+        UUID id = UUID.randomUUID();
+        mockMvc.perform(delete("/breakages/{id}", id))
+                .andExpect(status().isOk());
     }
 }
