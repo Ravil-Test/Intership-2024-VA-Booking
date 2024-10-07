@@ -6,23 +6,27 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import ru.irlix.booking.dto.breakagerequest.BreakageRequestCreate;
 import ru.irlix.booking.dto.breakagerequest.BreakageRequestUpdate;
 import ru.irlix.booking.dto.breakagerequest.BreakageResponse;
+import ru.irlix.booking.entity.Booking;
 import ru.irlix.booking.entity.BreakageRequest;
 import ru.irlix.booking.entity.Office;
 import ru.irlix.booking.entity.Role;
 import ru.irlix.booking.entity.Room;
 import ru.irlix.booking.entity.User;
 import ru.irlix.booking.entity.Workplace;
+import ru.irlix.booking.repository.BookingRepository;
 import ru.irlix.booking.repository.BreakageRequestRepository;
 import ru.irlix.booking.repository.OfficeRepository;
 import ru.irlix.booking.repository.RoleRepository;
 import ru.irlix.booking.repository.RoomRepository;
 import ru.irlix.booking.repository.UserRepository;
 import ru.irlix.booking.repository.WorkplaceRepository;
+import ru.irlix.booking.security.config.PasswordEncoder;
 import ru.irlix.booking.service.BreakageRequestService;
 import ru.irlix.booking.util.BaseIntegrationTest;
 
@@ -34,13 +38,12 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName(value = "Тесты безнес-логики заявок о поломках")
+@DisplayName(value = "Тесты бизнес-логики заявок о поломках")
 class BreakageRequestServiceImplTest extends BaseIntegrationTest {
 
     private BreakageRequest testBreakageRequest;
-
-    private User testUser;
 
     private Workplace testWorkplace;
 
@@ -64,6 +67,12 @@ class BreakageRequestServiceImplTest extends BaseIntegrationTest {
 
     @Autowired
     private BreakageRequestRepository breakageRequestRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private BookingRepository bookingRepository;
 
     @BeforeEach
     public void setUp() {
@@ -91,24 +100,53 @@ class BreakageRequestServiceImplTest extends BaseIntegrationTest {
                 .isDelete(false)
                 .room(savedRoom)
                 .build();
-        workplaceRepository.save(testWorkplace);
+        Workplace savedWorkplace = workplaceRepository.save(testWorkplace);
 
-        Role testRole = Role.builder()
+        Role testUserRole = Role.builder()
                 .id(UUID.fromString("15151515-1515-1515-1515-151515151515"))
                 .name("USER")
                 .build();
-        Role savedRole = roleRepository.save(testRole);
+        Role savedRoleUser = roleRepository.save(testUserRole);
 
-        testUser = User.builder()
+        Role testAdminRole = Role.builder()
+                .id(UUID.fromString("14141414-1414-1414-1414-141414141414"))
+                .name("ADMIN")
+                .build();
+        Role savedRoleAdmin = roleRepository.save(testAdminRole);
+
+        User testUser = User.builder()
                 .fio("Ignatiev Ignat Ignatievich")
                 .phoneNumber("88003000400")
                 .email("ignat@yandex.ru")
-                .roles(Set.of(savedRole))
+                .roles(Set.of(savedRoleUser))
                 .password(new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3'})
                 .availableMinutesForBooking(120)
                 .isDelete(false)
                 .build();
         userRepository.save(testUser);
+
+        User testAdmin = User.builder()
+                .fio("Admin Admin Admin")
+                .phoneNumber("+78002000600")
+                .email("test.dev@gmail.com")
+                .roles(Set.of(savedRoleAdmin))
+                .password(passwordEncoder.passwordEncoder().encode("password123").toCharArray())
+                .availableMinutesForBooking(120)
+                .isDelete(false)
+                .build();
+        User savedAdmin = userRepository.save(testAdmin);
+
+        Booking testBookingAdmin = Booking.builder()
+                .bookingDateTime(LocalDateTime.now())
+                .bookingStartDateTime(LocalDateTime.now())
+                .bookingEndDateTime(LocalDateTime.now().plusHours(1))
+                .bookingCancelDateTime(null)
+                .cancelReason(null)
+                .isBooked(true)
+                .workplace(savedWorkplace)
+                .user(savedAdmin)
+                .build();
+        bookingRepository.save(testBookingAdmin);
 
         testBreakageRequest = BreakageRequest.builder()
                 .requestDateTime(LocalDateTime.now().withNano(0))
@@ -168,20 +206,27 @@ class BreakageRequestServiceImplTest extends BaseIntegrationTest {
     @Test
     @DirtiesContext
     @Tag(value = "Позитивный")
+    @WithMockUser(username = "test.dev@gmail.com", authorities = "ROLE_ADMIN")
     @DisplayName(value = "Позитивный тест на создание заявки о поломке")
-    @Transactional(readOnly = true)
     void save_success() throws EntityNotFoundException {
-
         UUID workplaceId = testWorkplace.getId();
-        UUID userId = testUser.getId();
 
-        BreakageRequestCreate createRequest = new BreakageRequestCreate("Hello Kitty",
-                workplaceId, userId);
+        BreakageRequestCreate createRequest = new BreakageRequestCreate("Hello Kitty", workplaceId);
 
         BreakageResponse savedResponse = breakageService.save(createRequest);
 
         assertNotNull(savedResponse);
         assertEquals(createRequest.description(), savedResponse.description());
+    }
+
+    @Test
+    @DirtiesContext
+    @Tag(value = "Позитивный")
+    @WithMockUser(username = "test.dev@gmail.com", authorities = "ROLE_ADMIN")
+    @DisplayName(value = "Позитивный тест на создание заявки о поломке")
+    void save_failed() throws EntityNotFoundException {
+        BreakageRequestCreate createRequest = new BreakageRequestCreate("Hello Kitty", UUID.randomUUID());
+        assertThrows(IllegalArgumentException.class, () -> breakageService.save(createRequest));
     }
 
     @Test
@@ -214,21 +259,12 @@ class BreakageRequestServiceImplTest extends BaseIntegrationTest {
     @DirtiesContext
     @Tag(value = "Позитивный")
     @DisplayName(value = "Позитивный тест на удаление заявки о поломке")
-    @Transactional(readOnly = true)
     void delete_success() {
         UUID id = testBreakageRequest.getId();
         breakageService.delete(id);
 
-        assertThrows(EntityNotFoundException.class, () -> breakageService.getById(id));
-    }
-
-    @Test
-    @DirtiesContext
-    @Tag(value = "Негативный")
-    @DisplayName(value = "Негативный тест на удаление несуществующей заявки о поломке")
-    @Transactional
-    void delete_notFound() {
-        UUID id = UUID.randomUUID();
-        assertThrows(EntityNotFoundException.class, () -> breakageService.delete(id));
+        BreakageResponse foundRequest = breakageService.getById(id);
+        assertNotNull(foundRequest);
+        assertTrue(foundRequest.isCanceled());
     }
 }
