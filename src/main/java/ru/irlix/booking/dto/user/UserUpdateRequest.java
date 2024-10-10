@@ -5,6 +5,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import ru.irlix.booking.entity.Role;
+
+import java.util.Set;
 
 
 /**
@@ -34,6 +37,11 @@ public record UserUpdateRequest(
         @JsonProperty(value = "password")
         @Schema(title = "Пароль от учётной записи пользователя",
                 example = "password123")
-        char[] password
+        char[] password,
+
+        @JsonProperty(value = "roles")
+        @Schema(title = "Роль пользователя",
+                example = "USER")
+        Set<Role> roles
 ) {
 }

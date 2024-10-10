@@ -35,7 +35,7 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "isDelete", ignore = true)
     @Mapping(target = "availableMinutesForBooking", ignore = true)
-    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "roles", source = "roles")
     @Mapping(target = "bookings", ignore = true)
     @Mapping(target = "breakageRequests", ignore = true)
     User updateRequestToEntity(UserUpdateRequest updateRequest);
